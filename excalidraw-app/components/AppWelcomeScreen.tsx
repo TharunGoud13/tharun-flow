@@ -25,7 +25,38 @@ export const AppWelcomeScreen: React.FC<{
       <WelcomeScreen.Hints.ToolbarHint />
       <WelcomeScreen.Hints.HelpHint />
       <WelcomeScreen.Center>
-        <WelcomeScreen.Center.Logo />
+        <WelcomeScreen.Center.Logo>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 12,
+              fontSize: 34,
+              fontWeight: 800,
+              letterSpacing: "-0.5px",
+              color: "#e03131",
+              fontFamily: "var(--ui-font)",
+              userSelect: "none",
+            }}
+          >
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#e03131"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polygon points="12 2 2 7 12 12 22 7 12 2" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 12 17 22 12" />
+            </svg>
+            tharun-flow
+          </div>
+        </WelcomeScreen.Center.Logo>
         <WelcomeScreen.Center.Heading>
           {headingContent}
         </WelcomeScreen.Center.Heading>

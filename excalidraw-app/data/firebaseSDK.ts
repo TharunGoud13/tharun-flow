@@ -9,6 +9,8 @@ export {
   getFirestore,
   doc,
   getDoc,
+  setDoc,
+  deleteDoc,
   runTransaction,
   Bytes,
 } from "firebase/firestore";

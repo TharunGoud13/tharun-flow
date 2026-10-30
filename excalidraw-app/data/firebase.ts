@@ -60,10 +60,10 @@ const _initializeFirebase = lazy(async () => {
   return { sdk, app: sdk.initializeApp(FIREBASE_CONFIG) };
 });
 
-const _loadFirestore = lazy(async () => {
+export const loadFirestore = lazy(async () => {
   const { sdk, app } = await _initializeFirebase();
-  const { getFirestore, doc, getDoc, runTransaction, Bytes } = sdk;
-  return { firestore: getFirestore(app), doc, getDoc, runTransaction, Bytes };
+  const { getFirestore, doc, getDoc, setDoc, deleteDoc, runTransaction, Bytes } = sdk;
+  return { firestore: getFirestore(app), doc, getDoc, setDoc, deleteDoc, runTransaction, Bytes };
 });
 
 const _loadStorage = lazy(async () => {
@@ -179,7 +179,7 @@ const createFirebaseSceneDocument = async (
 ) => {
   const sceneVersion = getSceneVersion(elements);
   const { ciphertext, iv } = await encryptElements(roomKey, elements);
-  const { Bytes } = await _loadFirestore();
+  const { Bytes } = await loadFirestore();
   return {
     sceneVersion,
     ciphertext: Bytes.fromUint8Array(new Uint8Array(ciphertext)),
@@ -203,7 +203,7 @@ export const saveToFirebase = async (
     return null;
   }
 
-  const { firestore, doc, runTransaction } = await _loadFirestore();
+  const { firestore, doc, runTransaction } = await loadFirestore();
   const docRef = doc(firestore, "scenes", roomId);
 
   const storedScene = await runTransaction(firestore, async (transaction) => {
@@ -254,7 +254,7 @@ export const loadFromFirebase = async (
   roomKey: string,
   socket: Socket | null,
 ): Promise<readonly SyncableExcalidrawElement[] | null> => {
-  const { firestore, doc, getDoc } = await _loadFirestore();
+  const { firestore, doc, getDoc } = await loadFirestore();
   const docRef = doc(firestore, "scenes", roomId);
   const docSnap = await getDoc(docRef);
   if (!docSnap.exists()) {

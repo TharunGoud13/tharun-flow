@@ -45,7 +45,7 @@ import {
   share,
   youtubeIcon,
 } from "@excalidraw/excalidraw/components/icons";
-import { isElementLink } from "@excalidraw/element";
+import { isElementLink, getSceneVersion } from "@excalidraw/element";
 import {
   bumpElementVersions,
   restoreAppState,
@@ -139,6 +139,15 @@ import { AIComponents } from "./components/AI";
 import "./index.scss";
 
 import { AppSidebar } from "./components/AppSidebar";
+import { DiagramHistoryModal } from "./components/DiagramHistoryModal";
+import { DiagramSwitcher, SaveStatus } from "./components/DiagramSwitcher";
+import {
+  FirebaseDiagramRecord,
+  initFirebaseDiagramStorage,
+  saveDiagramToFirebase,
+  createNewDiagramRecord,
+  setActiveDiagramId,
+} from "./data/firebaseDiagramStorage";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -222,6 +231,16 @@ const initializeScene = async (opts: {
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
+  const activeDiagram = await initFirebaseDiagramStorage(localDataState?.elements);
+
+  const initialElements =
+    activeDiagram?.elements && activeDiagram.elements.length > 0
+      ? activeDiagram.elements
+      : localDataState?.elements;
+
+  const initialAppState = activeDiagram?.appState
+    ? { ...localDataState?.appState, ...activeDiagram.appState }
+    : localDataState?.appState;
 
   let scene: Omit<
     RestoredDataState,
@@ -231,11 +250,11 @@ const initializeScene = async (opts: {
   > & {
     scrollToContent?: boolean;
   } = {
-    elements: restoreElements(localDataState?.elements, null, {
+    elements: restoreElements(initialElements, null, {
       repairBindings: true,
       deleteInvisibleElements: true,
     }),
-    appState: restoreAppState(localDataState?.appState, null),
+    appState: restoreAppState(initialAppState, null),
   };
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
@@ -442,6 +461,109 @@ const ExcalidrawWrapper = () => {
   });
 
   const [, forceRefresh] = useState(false);
+
+  const [activeDiagram, setActiveDiagram] = useState<FirebaseDiagramRecord | null>(null);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const isLoadedRef = useRef(false);
+  const lastSavedSceneVersionRef = useRef<number>(-1);
+
+  useEffect(() => {
+    initFirebaseDiagramStorage().then((diag) => {
+      setActiveDiagram(diag);
+      lastSavedSceneVersionRef.current = getSceneVersion(diag.elements || []);
+      setSaveStatus("saved");
+      setTimeout(() => {
+        isLoadedRef.current = true;
+      }, 500);
+    });
+  }, []);
+
+  const handleSaveToFirebase = useCallback(async () => {
+    if (!excalidrawAPI || !activeDiagram) {
+      return;
+    }
+    setSaveStatus("saving");
+    try {
+      const elements = excalidrawAPI.getSceneElements();
+      const appState = excalidrawAPI.getAppState();
+
+      const res = await saveDiagramToFirebase({
+        id: activeDiagram.id,
+        name: activeDiagram.name,
+        elements,
+        appState: {
+          viewBackgroundColor: appState.viewBackgroundColor,
+          zoom: appState.zoom,
+          scrollX: appState.scrollX,
+          scrollY: appState.scrollY,
+        },
+        createdAt: activeDiagram.createdAt || Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      if (res.success) {
+        lastSavedSceneVersionRef.current = getSceneVersion(elements);
+        setSaveStatus("saved");
+        excalidrawAPI.setToast({
+          message: `Saved "${activeDiagram.name}" to Firebase!`,
+          duration: 2500,
+        });
+      } else {
+        setSaveStatus("error");
+        excalidrawAPI.setToast({
+          message: `Save error: ${res.error || "Failed to save"}`,
+          duration: 4000,
+        });
+      }
+    } catch (err: any) {
+      console.error("Save to Firebase error:", err);
+      setSaveStatus("error");
+    }
+  }, [excalidrawAPI, activeDiagram]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSaveToFirebase();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSaveToFirebase]);
+
+  const handleSelectDiagram = useCallback(
+    async (diagram: FirebaseDiagramRecord) => {
+      isLoadedRef.current = false;
+      setActiveDiagramId(diagram.id);
+      setActiveDiagram(diagram);
+      lastSavedSceneVersionRef.current = getSceneVersion(diagram.elements || []);
+      setSaveStatus("saved");
+      if (excalidrawAPI) {
+        excalidrawAPI.updateScene({
+          elements: restoreElements(diagram.elements || [], null, {
+            repairBindings: true,
+          }),
+          appState: restoreAppState(diagram.appState || {}, null),
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        });
+      }
+      setTimeout(() => {
+        isLoadedRef.current = true;
+      }, 500);
+    },
+    [excalidrawAPI],
+  );
+
+  const handleQuickNew = useCallback(async () => {
+    const newDiag = createNewDiagramRecord();
+    const res = await saveDiagramToFirebase(newDiag);
+    if (res.success) {
+      handleSelectDiagram(newDiag);
+    }
+  }, [handleSelectDiagram]);
 
   useEffect(() => {
     if (isDevEnv()) {
@@ -712,6 +834,15 @@ const ExcalidrawWrapper = () => {
       collabAPI.syncElements(elements);
     }
 
+    const currentVersion = getSceneVersion(elements);
+    if (isLoadedRef.current && lastSavedSceneVersionRef.current !== -1) {
+      if (currentVersion !== lastSavedSceneVersionRef.current) {
+        setSaveStatus((prev) => (prev === "unsaved" ? prev : "unsaved"));
+      } else {
+        setSaveStatus((prev) => (prev === "saved" ? prev : "saved"));
+      }
+    }
+
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
     if (!LocalData.isSavePaused()) {
@@ -928,6 +1059,15 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={editorTheme}
         onThemeChange={setAppTheme}
+        renderTopLeftUI={() => (
+          <DiagramSwitcher
+            activeDiagramName={activeDiagram?.name || "Diagram"}
+            saveStatus={saveStatus}
+            onSave={handleSaveToFirebase}
+            onOpenHistory={() => setIsHistoryModalOpen(true)}
+            onQuickNew={handleQuickNew}
+          />
+        )}
         renderTopRightUI={(isMobile) => {
           if (isMobile || !collabAPI || !isCollabAvailable) {
             return null;
@@ -963,6 +1103,9 @@ const ExcalidrawWrapper = () => {
           isCollabEnabled={isCollabAvailable}
           theme={appTheme}
           refresh={() => forceRefresh((prev) => !prev)}
+          onOpenHistory={() => setIsHistoryModalOpen(true)}
+          onNewDiagram={handleQuickNew}
+          onSaveToFirebase={handleSaveToFirebase}
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
@@ -1087,81 +1230,6 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              label: "GitHub",
-              icon: GithubIcon,
-              category: DEFAULT_CATEGORIES.links,
-              predicate: true,
-              keywords: [
-                "issues",
-                "bugs",
-                "requests",
-                "report",
-                "features",
-                "social",
-                "community",
-              ],
-              perform: () => {
-                window.open(
-                  "https://github.com/excalidraw/excalidraw",
-                  "_blank",
-                  "noopener noreferrer",
-                );
-              },
-            },
-            {
-              label: t("labels.followUs"),
-              icon: XBrandIcon,
-              category: DEFAULT_CATEGORIES.links,
-              predicate: true,
-              keywords: ["twitter", "contact", "social", "community"],
-              perform: () => {
-                window.open(
-                  "https://x.com/excalidraw",
-                  "_blank",
-                  "noopener noreferrer",
-                );
-              },
-            },
-            {
-              label: t("labels.discordChat"),
-              category: DEFAULT_CATEGORIES.links,
-              predicate: true,
-              icon: DiscordIcon,
-              keywords: [
-                "chat",
-                "talk",
-                "contact",
-                "bugs",
-                "requests",
-                "report",
-                "feedback",
-                "suggestions",
-                "social",
-                "community",
-              ],
-              perform: () => {
-                window.open(
-                  "https://discord.gg/UexuTaE",
-                  "_blank",
-                  "noopener noreferrer",
-                );
-              },
-            },
-            {
-              label: "YouTube",
-              icon: youtubeIcon,
-              category: DEFAULT_CATEGORIES.links,
-              predicate: true,
-              keywords: ["features", "tutorials", "howto", "help", "community"],
-              perform: () => {
-                window.open(
-                  "https://youtube.com/@excalidraw",
-                  "_blank",
-                  "noopener noreferrer",
-                );
-              },
-            },
-            {
               label: t("labels.installPWA"),
               category: DEFAULT_CATEGORIES.app,
               predicate: () => !!pwaEvent,
@@ -1186,6 +1254,13 @@ const ExcalidrawWrapper = () => {
           />
         )}
       </Excalidraw>
+      <DiagramHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        excalidrawAPI={excalidrawAPI}
+        onSelectDiagram={handleSelectDiagram}
+        activeDiagramId={activeDiagram?.id || null}
+      />
     </div>
   );
 };
