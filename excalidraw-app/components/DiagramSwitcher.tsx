@@ -1,4 +1,14 @@
 import React from "react";
+import {
+  PanelLeft,
+  Layers,
+  ChevronDown,
+  Plus,
+  Save,
+  Check,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 
 export type SaveStatus = "saved" | "unsaved" | "saving" | "error";
 
@@ -6,39 +16,71 @@ interface Props {
   activeDiagramName: string;
   saveStatus: SaveStatus;
   onSave: () => void;
-  onOpenHistory: () => void;
+  onToggleSidebar: () => void;
   onQuickNew: () => void;
+  isSidebarOpen?: boolean;
 }
 
 export const DiagramSwitcher: React.FC<Props> = ({
   activeDiagramName,
   saveStatus,
   onSave,
-  onOpenHistory,
+  onToggleSidebar,
   onQuickNew,
+  isSidebarOpen,
 }) => {
   return (
     <div
       style={{
         display: "inline-flex",
         alignItems: "center",
-        gap: "8px",
-        height: "var(--default-button-size, 2.25rem)",
+        gap: "6px",
+        height: "36px",
         zIndex: 5,
       }}
     >
-      {/* Diagram Switcher / History Button */}
+      {/* 1. Sidebar Toggle Button (ChatGPT style panel icon) */}
       <button
         type="button"
-        onClick={onOpenHistory}
-        title="View Diagram History & Switch Diagrams"
+        onClick={onToggleSidebar}
+        title="Toggle Diagram History (Sidebar)"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "36px",
+          width: "36px",
+          borderRadius: "8px",
+          border: isSidebarOpen
+            ? "1px solid var(--color-primary, #e03131)"
+            : "1px solid var(--default-border-color, #e0e0e0)",
+          backgroundColor: isSidebarOpen
+            ? "var(--color-primary-light, #fff5f5)"
+            : "var(--island-bg-color, #ffffff)",
+          color: isSidebarOpen
+            ? "var(--color-primary, #e03131)"
+            : "var(--text-primary-color, #1e1e1e)",
+          cursor: "pointer",
+          boxShadow: "var(--shadow-island)",
+          transition: "all 0.15s ease",
+          flexShrink: 0,
+        }}
+      >
+        <PanelLeft size={17} strokeWidth={2.2} />
+      </button>
+
+      {/* 2. Diagram Name & History Opener */}
+      <button
+        type="button"
+        onClick={onToggleSidebar}
+        title="Diagram History & Switcher"
         style={{
           display: "inline-flex",
           alignItems: "center",
           gap: "8px",
-          height: "100%",
+          height: "36px",
           padding: "0 12px",
-          borderRadius: "var(--border-radius-lg, 8px)",
+          borderRadius: "8px",
           border: "1px solid var(--default-border-color, #e0e0e0)",
           backgroundColor: "var(--island-bg-color, #ffffff)",
           color: "var(--text-primary-color, #1e1e1e)",
@@ -47,7 +89,7 @@ export const DiagramSwitcher: React.FC<Props> = ({
           fontWeight: 600,
           boxShadow: "var(--shadow-island)",
           transition: "all 0.15s ease",
-          maxWidth: "220px",
+          maxWidth: "200px",
         }}
       >
         <span
@@ -55,23 +97,10 @@ export const DiagramSwitcher: React.FC<Props> = ({
             color: "var(--color-primary, #e03131)",
             display: "inline-flex",
             alignItems: "center",
+            flexShrink: 0,
           }}
         >
-          {/* Flow Diagram icon */}
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-            <path d="M2 17l10 5 10-5" />
-            <path d="M2 12l10 5 10-5" />
-          </svg>
+          <Layers size={16} strokeWidth={2.4} />
         </span>
         <span
           style={{
@@ -82,22 +111,12 @@ export const DiagramSwitcher: React.FC<Props> = ({
         >
           {activeDiagramName || "Untitled Diagram"}
         </span>
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          style={{ opacity: 0.6, flexShrink: 0 }}
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
+        <span style={{ opacity: 0.6, display: "inline-flex", alignItems: "center", flexShrink: 0 }}>
+          <ChevronDown size={14} strokeWidth={2.4} />
+        </span>
       </button>
 
-      {/* New Diagram Button */}
+      {/* 3. Quick New Diagram Button */}
       <button
         type="button"
         onClick={onQuickNew}
@@ -106,24 +125,24 @@ export const DiagramSwitcher: React.FC<Props> = ({
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          height: "100%",
-          width: "var(--default-button-size, 2.25rem)",
-          borderRadius: "var(--border-radius-lg, 8px)",
+          height: "36px",
+          width: "36px",
+          borderRadius: "8px",
           border: "1px solid var(--default-border-color, #e0e0e0)",
           backgroundColor: "var(--island-bg-color, #ffffff)",
           color: "var(--color-primary, #e03131)",
           cursor: "pointer",
-          fontSize: "1.2rem",
-          fontWeight: 700,
           boxShadow: "var(--shadow-island)",
           transition: "all 0.15s ease",
+          flexShrink: 0,
         }}
       >
-        +
+        <Plus size={18} strokeWidth={2.6} />
       </button>
 
-      {/* Explicit Save to Firebase Button */}
+      {/* 4. Explicit Save to Firebase Button */}
       <button
+        id="save-to-firebase-button"
         type="button"
         onClick={onSave}
         disabled={saveStatus === "saving"}
@@ -133,16 +152,16 @@ export const DiagramSwitcher: React.FC<Props> = ({
             : saveStatus === "saving"
             ? "Saving to Firebase..."
             : saveStatus === "error"
-            ? "Error saving. Click to retry."
+            ? "Save failed. Click to retry."
             : "Diagram saved to Firebase"
         }
         style={{
           display: "inline-flex",
           alignItems: "center",
           gap: "6px",
-          height: "100%",
+          height: "36px",
           padding: "0 12px",
-          borderRadius: "var(--border-radius-lg, 8px)",
+          borderRadius: "8px",
           border:
             saveStatus === "unsaved"
               ? "1px solid #e03131"
@@ -166,78 +185,37 @@ export const DiagramSwitcher: React.FC<Props> = ({
           fontWeight: 600,
           boxShadow:
             saveStatus === "unsaved"
-              ? "0 2px 6px rgba(224, 49, 49, 0.35)"
+              ? "0 2px 8px rgba(224, 49, 49, 0.35)"
               : "var(--shadow-island)",
           transition: "all 0.18s ease",
+          flexShrink: 0,
         }}
       >
         {saveStatus === "saving" && (
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
+          <span
             style={{
+              display: "inline-flex",
+              alignItems: "center",
               animation: "spin 1s linear infinite",
             }}
           >
             <style>
               {`@keyframes spin { 100% { transform: rotate(360deg); } }`}
             </style>
-            <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-            <path d="M12 2a10 10 0 0 1 10 10" />
-          </svg>
+            <Loader2 size={15} strokeWidth={2.5} />
+          </span>
         )}
 
         {saveStatus === "saved" && (
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#2f9e44"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+          <Check size={16} color="#2b8a3e" strokeWidth={2.6} />
         )}
 
         {saveStatus === "unsaved" && (
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-            <polyline points="17 21 17 13 7 13 7 21" />
-            <polyline points="7 3 7 8 15 8" />
-          </svg>
+          <Save size={15} strokeWidth={2.4} />
         )}
 
         {saveStatus === "error" && (
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#e03131"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
+          <AlertCircle size={15} color="#e03131" strokeWidth={2.4} />
         )}
 
         <span>

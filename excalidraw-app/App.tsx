@@ -139,8 +139,9 @@ import { AIComponents } from "./components/AI";
 import "./index.scss";
 
 import { AppSidebar } from "./components/AppSidebar";
-import { DiagramHistoryModal } from "./components/DiagramHistoryModal";
+import { DiagramHistorySidebar } from "./components/DiagramHistorySidebar";
 import { DiagramSwitcher, SaveStatus } from "./components/DiagramSwitcher";
+import { ToastNotification, ToastData } from "./components/ToastNotification";
 import {
   FirebaseDiagramRecord,
   initFirebaseDiagramStorage,
@@ -464,7 +465,8 @@ const ExcalidrawWrapper = () => {
 
   const [activeDiagram, setActiveDiagram] = useState<FirebaseDiagramRecord | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
-  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [toast, setToast] = useState<ToastData | null>(null);
   const isLoadedRef = useRef(false);
   const lastSavedSceneVersionRef = useRef<number>(-1);
 
@@ -485,7 +487,7 @@ const ExcalidrawWrapper = () => {
     }
     setSaveStatus("saving");
     try {
-      const elements = excalidrawAPI.getSceneElements();
+      const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
       const appState = excalidrawAPI.getAppState();
 
       const res = await saveDiagramToFirebase({
@@ -505,20 +507,34 @@ const ExcalidrawWrapper = () => {
       if (res.success) {
         lastSavedSceneVersionRef.current = getSceneVersion(elements);
         setSaveStatus("saved");
+        setToast({
+          id: Date.now(),
+          type: "success",
+          message: "Saved to Firebase successfully!",
+          subMessage: `"${activeDiagram.name}" is persistent in Firestore.`,
+        });
         excalidrawAPI.setToast({
           message: `Saved "${activeDiagram.name}" to Firebase!`,
-          duration: 2500,
+          duration: 3000,
         });
       } else {
         setSaveStatus("error");
-        excalidrawAPI.setToast({
-          message: `Save error: ${res.error || "Failed to save"}`,
-          duration: 4000,
+        setToast({
+          id: Date.now(),
+          type: "error",
+          message: "Failed to save to Firebase",
+          subMessage: res.error || "Please check your network connection.",
         });
       }
     } catch (err: any) {
       console.error("Save to Firebase error:", err);
       setSaveStatus("error");
+      setToast({
+        id: Date.now(),
+        type: "error",
+        message: "Save error occurred",
+        subMessage: err?.message || "Unknown error",
+      });
     }
   }, [excalidrawAPI, activeDiagram]);
 
@@ -1064,8 +1080,9 @@ const ExcalidrawWrapper = () => {
             activeDiagramName={activeDiagram?.name || "Diagram"}
             saveStatus={saveStatus}
             onSave={handleSaveToFirebase}
-            onOpenHistory={() => setIsHistoryModalOpen(true)}
+            onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
             onQuickNew={handleQuickNew}
+            isSidebarOpen={isSidebarOpen}
           />
         )}
         renderTopRightUI={(isMobile) => {
@@ -1103,7 +1120,7 @@ const ExcalidrawWrapper = () => {
           isCollabEnabled={isCollabAvailable}
           theme={appTheme}
           refresh={() => forceRefresh((prev) => !prev)}
-          onOpenHistory={() => setIsHistoryModalOpen(true)}
+          onOpenHistory={() => setIsSidebarOpen(true)}
           onNewDiagram={handleQuickNew}
           onSaveToFirebase={handleSaveToFirebase}
         />
@@ -1254,13 +1271,14 @@ const ExcalidrawWrapper = () => {
           />
         )}
       </Excalidraw>
-      <DiagramHistoryModal
-        isOpen={isHistoryModalOpen}
-        onClose={() => setIsHistoryModalOpen(false)}
-        excalidrawAPI={excalidrawAPI}
+      <DiagramHistorySidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
         onSelectDiagram={handleSelectDiagram}
+        onNewDiagram={handleQuickNew}
         activeDiagramId={activeDiagram?.id || null}
       />
+      <ToastNotification toast={toast} onClose={() => setToast(null)} />
     </div>
   );
 };

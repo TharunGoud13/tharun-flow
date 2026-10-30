@@ -96,5 +96,8 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "lucide-react": "1.65.0"
   }
 }

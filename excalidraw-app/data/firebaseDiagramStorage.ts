@@ -324,3 +324,4 @@ export const initFirebaseDiagramStorage = async (
   await saveDiagramToFirebase(initial);
   return initial;
 };
+
