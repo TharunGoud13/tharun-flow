@@ -1,131 +1,124 @@
-# Eraser Canvas — Technical Architecture Diagramming Platform
+<a href="https://excalidraw.com/" target="_blank" rel="noopener">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png" />
+    <img alt="Excalidraw" src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2.png" />
+  </picture>
+</a>
 
-A production-grade technical diagramming web application inspired by the workflow, canvas aesthetics, and Diagram-as-Code features of [Eraser.io](https://www.eraser.io/).
+<h4 align="center">
+  <a href="https://excalidraw.com">Excalidraw Editor</a> |
+  <a href="https://plus.excalidraw.com/blog">Blog</a> |
+  <a href="https://docs.excalidraw.com">Documentation</a> |
+  <a href="https://plus.excalidraw.com">Excalidraw+</a>
+</h4>
 
----
+<div align="center">
+  <h2>
+    An open source virtual hand-drawn style whiteboard. </br>
+    Collaborative and end-to-end encrypted. </br>
+  <br />
+  </h2>
+</div>
 
-## ✨ Features
+<br />
+<p align="center">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
+    <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  /></a>
+  <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">
+    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  /></a>
+  <a href="https://docs.excalidraw.com/docs/introduction/contributing">
+    <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  /></a>
+  <a href="https://discord.gg/UexuTaE">
+    <img alt="Chat on Discord" src="https://img.shields.io/discord/723672430744174682?color=738ad6&label=Chat%20on%20Discord&logo=discord&logoColor=ffffff&widget=false"/></a>
+  <a href="https://deepwiki.com/excalidraw/excalidraw">
+    <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg" /></a>
+  <a href="https://twitter.com/excalidraw">
+    <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter"/></a>
+</p>
 
-- **Interactive Architecture Canvas**:
-  - Crisp dot-grid workspace with smooth pan, zoom (10%–200%), and trackpad pinch navigation.
-  - Multi-handle connection ports with magnetic snap.
-  - Interactive Minimap and quick Fit-to-Screen controls.
-- **Custom Technical Architecture Nodes**:
-  - Official high-fidelity vector tech icons (AWS, GCP, Azure, Docker, Kubernetes, React, Next.js, Node.js, Python, PostgreSQL, Redis, Kafka, MongoDB, Cloudflare, etc.).
-  - Primary title, secondary metadata subtitle (e.g., `"Fargate · 6 tasks"`), and customizable border/fill palettes.
-- **Smart Orthogonal Edge Routing**:
-  - Clean 90-degree elbow connectors with rounded corners.
-  - Interactive centered label pills with solid contrast backgrounds.
-  - Directional arrowheads and dashed/solid styles.
-- **Group & Subnet Containers**:
-  - Boundary boxes for VPCs, subnets, clusters, and microservice groups with customizable headers and dashed outlines.
-  - Fully resizable via corner/edge resize handles.
-- **Diagram-as-Code (Eraser DSL)**:
-  - Text-to-diagram compilation supporting Eraser's syntax:
-    ```
-    direction right
-    Client [icon: react, label: "React Frontend"]
-    API [icon: nodejs, label: "Node.js REST API"]
-    Database [icon: postgresql, label: "PostgreSQL DB"]
+<div align="center">
+  <figure>
+    <a href="https://excalidraw.com" target="_blank" rel="noopener">
+      <img src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png" alt="Product showcase" />
+    </a>
+    <figcaption>
+      <p align="center">
+        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.
+      </p>
+    </figcaption>
+  </figure>
+</div>
 
-    Client > API: "HTTPS GET/POST"
-    API > Database: "SQL Queries"
-    ```
-  - Hierarchical auto-layout powered by Dagre (`@dagrejs/dagre`).
-- **Offline-First Persistence (IndexedDB)**:
-  - Real-time debounced autosave (500ms) with explicit visual states (`Saving...`, `Saved to browser`).
-  - Stores all documents locally in browser IndexedDB—survives page refreshes and browser restarts without requiring an external login.
-  - Public shareable URLs (`/d/[id]`) with cryptographically secure random IDs.
-- **High-Resolution Export**:
-  - **PNG Image**: 2x Retina scale with full bounding box crop and background options.
-  - **SVG Vector**: Clean vector paths preserving all tech icons and fonts.
-  - **JSON Document**: Canonical diagram source export & validated import.
-- **Full History & Shortcuts**:
-  - Transactional Undo/Redo (`Cmd+Z`, `Cmd+Shift+Z`).
-  - Duplicate (`Cmd+D`), Delete (`Backspace` / `Del`), Deselect (`Escape`).
+## Features
 
----
+The Excalidraw editor (npm package) supports:
 
-## 🛠️ Tech Stack & Licenses
+- 💯&nbsp;Free & open-source.
+- 🎨&nbsp;Infinite, canvas-based whiteboard.
+- ✍️&nbsp;Hand-drawn like style.
+- 🌓&nbsp;Dark mode.
+- 🏗️&nbsp;Customizable.
+- 📷&nbsp;Image support.
+- 😀&nbsp;Shape libraries support.
+- 🌐&nbsp;Localization (i18n) support.
+- 🖼️&nbsp;Export to PNG, SVG & clipboard.
+- 💾&nbsp;Open format - export drawings as an `.excalidraw` json file.
+- ⚒️&nbsp;Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...
+- ➡️&nbsp;Arrow-binding & labeled arrows.
+- 🔙&nbsp;Undo / Redo.
+- 🔍&nbsp;Zoom and panning support.
 
-- **Framework**: [Next.js](https://nextjs.org/) (App Router) — MIT
-- **UI Engine**: [React 19](https://react.dev/) & [TypeScript](https://www.typescriptlang.org/) — MIT
-- **Canvas Engine**: [`@xyflow/react`](https://reactflow.dev/) (React Flow 12) — MIT
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) — MIT
-- **Icons**: [Lucide React](https://lucide.dev/) + Curated Vector Tech Logos — ISC / MIT
-- **State Management**: [Zustand](https://zustand.docs.pmnd.rs/) — MIT
-- **Local Persistence**: [idb](https://github.com/jakearchibald/idb) (IndexedDB) — ISC / MIT
-- **Graph Layout**: [`@dagrejs/dagre`](https://github.com/dagrejs/dagre) — MIT
-- **Image Generation**: [`html-to-image`](https://github.com/bubkoo/html-to-image) — MIT
+## Excalidraw.com
 
----
+The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app) is part of this repository as well, and the app features:
 
-## 🚀 Getting Started
+- 📡&nbsp;PWA support (works offline).
+- 🤼&nbsp;Real-time collaboration.
+- 🔒&nbsp;End-to-end encryption.
+- 💾&nbsp;Local-first support (autosaves to the browser).
+- 🔗&nbsp;Shareable links (export to a readonly link you can share with others).
 
-### 1. Installation
+We'll be adding these features as drop-in plugins for the npm package in the future.
+
+## Quick start
+
+**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
+
+Use `npm` or `yarn` to install the package.
+
 ```bash
-npm install
+npm install react react-dom @excalidraw/excalidraw
+# or
+yarn add react react-dom @excalidraw/excalidraw
 ```
 
-### 2. Development Server
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
 
-### 3. Production Build
-```bash
-npm run build
-npm start
-```
+## Contributing
 
-### 4. Running Tests
-```bash
-npm test
-```
+- Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
+- Want to contribute? Check out our [contribution guide](https://docs.excalidraw.com/docs/introduction/contributing) or let us know on [Discord](https://discord.gg/UexuTaE).
+- Want to help with translations? See the [translation guide](https://docs.excalidraw.com/docs/introduction/contributing#translating).
 
----
+## Integrations
 
-## 📁 Project Structure
+- [VScode extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
+- [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw)
 
-```
-eraser-canvas/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx              # Root HTML shell
-│   │   ├── page.tsx                # Main diagram studio
-│   │   ├── d/[id]/page.tsx         # Shareable diagram route by ID
-│   │   └── globals.css             # Tailwind v4 & React Flow CSS
-│   ├── components/
-│   │   ├── editor/
-│   │   │   ├── Canvas.tsx          # React Flow canvas container
-│   │   │   ├── EditorHeader.tsx    # Brand, title, autosave pill, export/share
-│   │   │   ├── ToolRail.tsx        # Floating left toolbar
-│   │   │   ├── ContextToolbar.tsx  # Quick color & style property bar
-│   │   │   ├── IconLibraryModal.tsx# Searchable categorized tech icons
-│   │   │   ├── ExportModal.tsx     # PNG/SVG/JSON export & import
-│   │   │   ├── ShareModal.tsx      # Share link generator
-│   │   │   └── RecentDiagramsModal.tsx # Saved diagrams browser
-│   │   ├── nodes/
-│   │   │   ├── ArchitectureNode.tsx# Tech node renderer with icons & badges
-│   │   │   ├── ShapeNode.tsx       # Basic shapes (box, diamond, cylinder, etc.)
-│   │   │   ├── GroupNode.tsx       # Subnet/VPC container node
-│   │   │   └── TextNode.tsx        # Text annotation node
-│   │   ├── edges/
-│   │   │   └── OrthogonalEdge.tsx  # Elbow router with centered label pills
-│   │   └── dsl/
-│   │       ├── DslPanel.tsx        # Diagram-as-code editor slide-over
-│   │       ├── eraserDslParser.ts  # DSL parser into AST
-│   │       └── dslLayout.ts        # Dagre hierarchical auto-layout
-│   ├── lib/
-│   │   ├── icons/techIcons.tsx     # Curated SVG tech icons registry
-│   │   ├── storage/idbStorage.ts   # IndexedDB persistence engine
-│   │   └── store/diagramStore.ts   # Zustand state and history stack
-│   └── types/
-│       └── diagram.ts              # Canonical document data model
-├── tests/
-│   └── diagram.test.mjs            # Unit tests for parser, IDs, and schema
-├── PROJECT_PLAN.md                 # Detailed project roadmap & milestones
-├── ARCHITECTURE.md                 # Technical architecture & engine comparison
-└── FEATURE_STATUS.md               # Feature matrix & verification records
-```
+## Who's integrating Excalidraw
+
+[Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/) • and many others
+
+## Sponsors & support
+
+If you like the project, you can become a sponsor at [Open Collective](https://opencollective.com/excalidraw) or use [Excalidraw+](https://plus.excalidraw.com/).
+
+## Thank you for supporting Excalidraw
+
+[<img src="https://opencollective.com/excalidraw/tiers/sponsors/0/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/0/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/1/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/1/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/2/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/2/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/3/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/3/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/4/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/4/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/5/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/5/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/6/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/6/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/7/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/7/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/8/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/8/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/9/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/9/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/10/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/10/website)
+
+<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/backers.svg?avatarHeight=32"/></a>
+
+Last but not least, we're thankful to these companies for offering their services for free:
+
+[![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
