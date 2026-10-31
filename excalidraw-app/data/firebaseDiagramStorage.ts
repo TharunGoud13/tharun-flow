@@ -16,6 +16,7 @@ export interface FirebaseDiagramRecord {
   name: string;
   elements: readonly ExcalidrawElement[];
   appState?: Partial<AppState>;
+  files?: Record<string, any>;
   createdAt: number;
   updatedAt: number;
 }
@@ -87,6 +88,7 @@ export const loadFirebaseDiagram = async (
     const data = snap.data();
     let elements: readonly ExcalidrawElement[] = [];
     let appState: Partial<AppState> = {};
+    let files: Record<string, any> = {};
 
     try {
       if (typeof data.elements === "string") {
@@ -108,11 +110,22 @@ export const loadFirebaseDiagram = async (
       console.warn("Failed to parse diagram appState from Firebase", e);
     }
 
+    try {
+      if (typeof data.files === "string") {
+        files = JSON.parse(data.files);
+      } else if (data.files && typeof data.files === "object") {
+        files = data.files;
+      }
+    } catch (e) {
+      console.warn("Failed to parse diagram files from Firebase", e);
+    }
+
     return {
       id: data.id || id,
       name: data.name || "Untitled Diagram",
       elements,
       appState,
+      files,
       createdAt: data.createdAt || Date.now(),
       updatedAt: data.updatedAt || Date.now(),
     };
@@ -143,6 +156,7 @@ export const saveDiagramToFirebase = async (
       name: diagram.name,
       elements: JSON.stringify(nonDeletedElements),
       appState: JSON.stringify(diagram.appState || {}),
+      files: JSON.stringify(diagram.files || {}),
       createdAt: diagram.createdAt || now,
       updatedAt: now,
       isDiagram: true,

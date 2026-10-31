@@ -233,6 +233,11 @@ export class LocalData {
     },
   });
 }
+import {
+  loadLibrariesFromFirebase,
+  saveLibrariesToFirebase,
+} from "./firebaseLibraryStorage";
+
 export class LibraryIndexedDBAdapter {
   /** IndexedDB database and store name */
   private static idb_name = STORAGE_KEYS.IDB_LIBRARY;
@@ -259,6 +264,59 @@ export class LibraryIndexedDBAdapter {
       data,
       LibraryIndexedDBAdapter.store,
     );
+  }
+}
+
+/**
+ * Cross-device Firebase Firestore Library Adapter.
+ * Persists all library items to Firebase Firestore so they are synchronized
+ * across all user devices seamlessly.
+ */
+export class LibraryFirebaseAdapter {
+  static async load(metadata?: { source: "load" | "save" }): Promise<LibraryPersistedData | null> {
+    // 1. Primary: load from Firebase Firestore for cross-device sync
+    try {
+      const fbItems = await loadLibrariesFromFirebase();
+      if (fbItems && fbItems.length > 0) {
+        // Cache to local IndexedDB for fast offline availability
+        try {
+          await LibraryIndexedDBAdapter.save({ libraryItems: fbItems });
+        } catch {}
+        return { libraryItems: fbItems };
+      }
+    } catch (err) {
+      console.warn("Failed loading libraries from Firebase:", err);
+    }
+
+    // 2. Fallback: local IndexedDB
+    try {
+      const localData = await LibraryIndexedDBAdapter.load();
+      if (localData && localData.libraryItems && localData.libraryItems.length > 0) {
+        // Asynchronously sync local libraries up to Firebase
+        saveLibrariesToFirebase(localData.libraryItems).catch(() => {});
+        return localData;
+      }
+    } catch (err) {
+      console.warn("Failed loading libraries from IndexedDB:", err);
+    }
+
+    return null;
+  }
+
+  static async save(data: LibraryPersistedData): Promise<void> {
+    // 1. Cache to local IndexedDB immediately
+    try {
+      await LibraryIndexedDBAdapter.save(data);
+    } catch (err) {
+      console.warn("Failed to save to local IndexedDB:", err);
+    }
+
+    // 2. Persist to Firebase Firestore for cross-device synchronization
+    try {
+      await saveLibrariesToFirebase(data.libraryItems);
+    } catch (err) {
+      console.error("Failed to persist libraries to Firebase Firestore:", err);
+    }
   }
 }
 

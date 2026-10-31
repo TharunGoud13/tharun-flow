@@ -23,6 +23,33 @@ module.exports.woff2BrowserPlugin = () => {
         return `/* WARN: The following content is generated during excalidraw-app build */
 
       @font-face {
+        font-family: "OnePlus Sans";
+        src: local("OnePlus Sans"), local("OnePlusSans"), local("OnePlus-Sans"),
+             url(/fonts/OnePlusSans/OnePlusSans-Regular.ttf) format("truetype");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "OnePlus Sans";
+        src: local("OnePlus Sans Medium"), local("OnePlusSans-Medium"),
+             url(/fonts/OnePlusSans/OnePlusSans-Medium.ttf) format("truetype");
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "OnePlus Sans";
+        src: local("OnePlus Sans Bold"), local("OnePlusSans-Bold"),
+             url(/fonts/OnePlusSans/OnePlusSans-Bold.ttf) format("truetype");
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
         font-family: "Assistant";
         src: url(${OSS_FONTS_CDN}fonts/Assistant/Assistant-Regular.woff2)
             format("woff2"),

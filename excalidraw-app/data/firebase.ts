@@ -34,16 +34,21 @@ import type { UploadMetadata } from "firebase/storage";
 // private
 // -----------------------------------------------------------------------------
 
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCMkxA60XIW8KbqMYL7edC4qT5l4qHX2h8",
+  authDomain: "excalidraw-oss-dev.firebaseapp.com",
+  projectId: "excalidraw-oss-dev",
+  storageBucket: "excalidraw-oss-dev.appspot.com",
+  messagingSenderId: "664559512677",
+  appId: "1:664559512677:web:a385181f2928d328a7aa8c",
+};
+
 let FIREBASE_CONFIG: Record<string, any>;
 try {
-  FIREBASE_CONFIG = JSON.parse(import.meta.env.VITE_APP_FIREBASE_CONFIG);
+  const envVal = import.meta.env.VITE_APP_FIREBASE_CONFIG;
+  FIREBASE_CONFIG = envVal ? JSON.parse(envVal) : DEFAULT_FIREBASE_CONFIG;
 } catch (error: any) {
-  console.warn(
-    `Error JSON parsing firebase config. Supplied value: ${
-      import.meta.env.VITE_APP_FIREBASE_CONFIG
-    }`,
-  );
-  FIREBASE_CONFIG = {};
+  FIREBASE_CONFIG = DEFAULT_FIREBASE_CONFIG;
 }
 
 const lazy = <T>(load: () => Promise<T>) => {

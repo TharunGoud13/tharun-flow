@@ -8,6 +8,8 @@ import {
   Check,
   Loader2,
   AlertCircle,
+  Cpu,
+  Library,
 } from "lucide-react";
 
 export type SaveStatus = "saved" | "unsaved" | "saving" | "error";
@@ -18,6 +20,8 @@ interface Props {
   onSave: () => void;
   onToggleSidebar: () => void;
   onQuickNew: () => void;
+  onOpenIcons?: () => void;
+  onOpenLibraries?: () => void;
   isSidebarOpen?: boolean;
 }
 
@@ -27,6 +31,8 @@ export const DiagramSwitcher: React.FC<Props> = ({
   onSave,
   onToggleSidebar,
   onQuickNew,
+  onOpenIcons,
+  onOpenLibraries,
   isSidebarOpen,
 }) => {
   return (
@@ -37,6 +43,7 @@ export const DiagramSwitcher: React.FC<Props> = ({
         gap: "6px",
         height: "36px",
         zIndex: 5,
+        fontFamily: "var(--ui-font)",
       }}
     >
       {/* 1. Sidebar Toggle Button (ChatGPT style panel icon) */}
@@ -52,16 +59,16 @@ export const DiagramSwitcher: React.FC<Props> = ({
           width: "36px",
           borderRadius: "8px",
           border: isSidebarOpen
-            ? "1px solid var(--color-primary, #e03131)"
-            : "1px solid var(--default-border-color, #e0e0e0)",
+            ? "1px solid #eb0029"
+            : "1px solid var(--default-border-color, #e2e8f0)",
           backgroundColor: isSidebarOpen
-            ? "var(--color-primary-light, #fff5f5)"
+            ? "var(--color-primary-light, #fff0f2)"
             : "var(--island-bg-color, #ffffff)",
           color: isSidebarOpen
-            ? "var(--color-primary, #e03131)"
-            : "var(--text-primary-color, #1e1e1e)",
+            ? "#eb0029"
+            : "var(--text-primary-color, #1e293b)",
           cursor: "pointer",
-          boxShadow: "var(--shadow-island)",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
           transition: "all 0.15s ease",
           flexShrink: 0,
         }}
@@ -81,20 +88,21 @@ export const DiagramSwitcher: React.FC<Props> = ({
           height: "36px",
           padding: "0 12px",
           borderRadius: "8px",
-          border: "1px solid var(--default-border-color, #e0e0e0)",
+          border: "1px solid var(--default-border-color, #e2e8f0)",
           backgroundColor: "var(--island-bg-color, #ffffff)",
-          color: "var(--text-primary-color, #1e1e1e)",
+          color: "var(--text-primary-color, #0f172a)",
           cursor: "pointer",
           fontSize: "0.85rem",
           fontWeight: 600,
-          boxShadow: "var(--shadow-island)",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
           transition: "all 0.15s ease",
           maxWidth: "200px",
+          fontFamily: "var(--ui-font)",
         }}
       >
         <span
           style={{
-            color: "var(--color-primary, #e03131)",
+            color: "#eb0029",
             display: "inline-flex",
             alignItems: "center",
             flexShrink: 0,
@@ -128,11 +136,11 @@ export const DiagramSwitcher: React.FC<Props> = ({
           height: "36px",
           width: "36px",
           borderRadius: "8px",
-          border: "1px solid var(--default-border-color, #e0e0e0)",
+          border: "1px solid var(--default-border-color, #e2e8f0)",
           backgroundColor: "var(--island-bg-color, #ffffff)",
-          color: "var(--color-primary, #e03131)",
+          color: "#eb0029",
           cursor: "pointer",
-          boxShadow: "var(--shadow-island)",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
           transition: "all 0.15s ease",
           flexShrink: 0,
         }}
@@ -164,58 +172,42 @@ export const DiagramSwitcher: React.FC<Props> = ({
           borderRadius: "8px",
           border:
             saveStatus === "unsaved"
-              ? "1px solid #e03131"
+              ? "1px solid #eb0029"
               : saveStatus === "error"
-              ? "1px solid #fa5252"
-              : "1px solid var(--default-border-color, #e0e0e0)",
+              ? "1px solid #ef4444"
+              : "1px solid var(--default-border-color, #e2e8f0)",
           backgroundColor:
             saveStatus === "unsaved"
-              ? "#e03131"
+              ? "#eb0029"
               : saveStatus === "error"
-              ? "#fff5f5"
+              ? "#fef2f2"
               : "var(--island-bg-color, #ffffff)",
           color:
             saveStatus === "unsaved"
               ? "#ffffff"
               : saveStatus === "error"
-              ? "#e03131"
-              : "var(--text-primary-color, #1e1e1e)",
-          cursor: saveStatus === "saving" ? "not-allowed" : "pointer",
+              ? "#dc2626"
+              : "var(--text-primary-color, #0f172a)",
+          cursor: saveStatus === "saving" ? "wait" : "pointer",
           fontSize: "0.85rem",
           fontWeight: 600,
           boxShadow:
             saveStatus === "unsaved"
-              ? "0 2px 8px rgba(224, 49, 49, 0.35)"
-              : "var(--shadow-island)",
+              ? "0 2px 8px rgba(235, 0, 41, 0.28)"
+              : "0 1px 3px rgba(0, 0, 0, 0.05)",
           transition: "all 0.18s ease",
-          flexShrink: 0,
+          opacity: saveStatus === "saving" ? 0.7 : 1,
+          fontFamily: "var(--ui-font)",
         }}
       >
-        {saveStatus === "saving" && (
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              animation: "spin 1s linear infinite",
-            }}
-          >
-            <style>
-              {`@keyframes spin { 100% { transform: rotate(360deg); } }`}
-            </style>
-            <Loader2 size={15} strokeWidth={2.5} />
-          </span>
-        )}
-
-        {saveStatus === "saved" && (
-          <Check size={16} color="#2b8a3e" strokeWidth={2.6} />
-        )}
-
-        {saveStatus === "unsaved" && (
-          <Save size={15} strokeWidth={2.4} />
-        )}
-
-        {saveStatus === "error" && (
-          <AlertCircle size={15} color="#e03131" strokeWidth={2.4} />
+        {saveStatus === "saving" ? (
+          <Loader2 size={16} strokeWidth={2.4} className="spin-animate" />
+        ) : saveStatus === "saved" ? (
+          <Check size={16} strokeWidth={2.4} color="#10b981" />
+        ) : saveStatus === "error" ? (
+          <AlertCircle size={16} strokeWidth={2.4} color="#dc2626" />
+        ) : (
+          <Save size={16} strokeWidth={2.2} />
         )}
 
         <span>
@@ -240,6 +232,88 @@ export const DiagramSwitcher: React.FC<Props> = ({
           />
         )}
       </button>
+
+      {/* 5. Architecture & Cloud Icons Button */}
+      {onOpenIcons && (
+        <button
+          type="button"
+          onClick={onOpenIcons}
+          title="Architecture & Cloud Icons"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "5px",
+            height: "36px",
+            padding: "0 10px",
+            borderRadius: "8px",
+            border: "1px solid var(--default-border-color, #e2e8f0)",
+            backgroundColor: "var(--island-bg-color, #ffffff)",
+            color: "var(--color-on-surface, #1e293b)",
+            fontSize: "13px",
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "all 0.15s ease",
+            fontFamily: "var(--ui-font)",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "#eb0029";
+            e.currentTarget.style.color = "#eb0029";
+            e.currentTarget.style.backgroundColor = "#fff0f2";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor =
+              "var(--default-border-color, #e2e8f0)";
+            e.currentTarget.style.color = "var(--color-on-surface, #1e293b)";
+            e.currentTarget.style.backgroundColor =
+              "var(--island-bg-color, #ffffff)";
+          }}
+        >
+          <Cpu size={15} strokeWidth={2.2} color="#eb0029" />
+          <span>Icons</span>
+        </button>
+      )}
+
+      {/* 6. Excalidraw Libraries Marketplace Button */}
+      {onOpenLibraries && (
+        <button
+          type="button"
+          onClick={onOpenLibraries}
+          title="Excalidraw Libraries (Cloud & Architecture)"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "5px",
+            height: "36px",
+            padding: "0 10px",
+            borderRadius: "8px",
+            border: "1px solid var(--default-border-color, #e2e8f0)",
+            backgroundColor: "var(--island-bg-color, #ffffff)",
+            color: "var(--color-on-surface, #1e293b)",
+            fontSize: "13px",
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "all 0.15s ease",
+            fontFamily: "var(--ui-font)",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "#eb0029";
+            e.currentTarget.style.color = "#eb0029";
+            e.currentTarget.style.backgroundColor = "#fff0f2";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor =
+              "var(--default-border-color, #e2e8f0)";
+            e.currentTarget.style.color = "var(--color-on-surface, #1e293b)";
+            e.currentTarget.style.backgroundColor =
+              "var(--island-bg-color, #ffffff)";
+          }}
+        >
+          <Library size={15} strokeWidth={2.2} color="#eb0029" />
+          <span>Libraries</span>
+        </button>
+      )}
     </div>
   );
 };

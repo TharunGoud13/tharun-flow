@@ -45,14 +45,19 @@ import {
   share,
   youtubeIcon,
 } from "@excalidraw/excalidraw/components/icons";
-import { isElementLink, getSceneVersion } from "@excalidraw/element";
+import {
+  isElementLink,
+  getSceneVersion,
+  newElementWith,
+  newImageElement,
+  isInitializedImageElement,
+} from "@excalidraw/element";
+import { randomId } from "@excalidraw/common";
 import {
   bumpElementVersions,
   restoreAppState,
   restoreElements,
 } from "@excalidraw/excalidraw/data/restore";
-import { newElementWith } from "@excalidraw/element";
-import { isInitializedImageElement } from "@excalidraw/element";
 import clsx from "clsx";
 import {
   parseLibraryTokensFromUrl,
@@ -70,6 +75,7 @@ import type {
   AppState,
   ExcalidrawImperativeAPI,
   BinaryFiles,
+  DataURL,
   ExcalidrawInitialDataState,
   UIAppState,
   ExcalidrawProps,
@@ -117,6 +123,7 @@ import {
 
 import { loadFilesFromFirebase } from "./data/firebase";
 import {
+  LibraryFirebaseAdapter,
   LibraryIndexedDBAdapter,
   LibraryLocalStorageMigrationAdapter,
   LocalData,
@@ -142,6 +149,9 @@ import { AppSidebar } from "./components/AppSidebar";
 import { DiagramHistorySidebar } from "./components/DiagramHistorySidebar";
 import { DiagramSwitcher, SaveStatus } from "./components/DiagramSwitcher";
 import { ToastNotification, ToastData } from "./components/ToastNotification";
+import { IconPickerModal } from "./components/IconPickerModal";
+import { LibraryMarketplaceModal } from "./components/LibraryMarketplaceModal";
+import type { IconDef } from "./components/iconData";
 import {
   FirebaseDiagramRecord,
   initFirebaseDiagramStorage,
@@ -456,8 +466,7 @@ const ExcalidrawWrapper = () => {
 
   useHandleLibrary({
     excalidrawAPI,
-    adapter: LibraryIndexedDBAdapter,
-    // TODO maybe remove this in several months (shipped: 24-03-11)
+    adapter: LibraryFirebaseAdapter,
     migrationAdapter: LibraryLocalStorageMigrationAdapter,
   });
 
@@ -466,6 +475,8 @@ const ExcalidrawWrapper = () => {
   const [activeDiagram, setActiveDiagram] = useState<FirebaseDiagramRecord | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+  const [isLibraryMarketplaceOpen, setIsLibraryMarketplaceOpen] = useState(false);
   const [toast, setToast] = useState<ToastData | null>(null);
   const isLoadedRef = useRef(false);
   const lastSavedSceneVersionRef = useRef<number>(-1);
@@ -481,6 +492,28 @@ const ExcalidrawWrapper = () => {
     });
   }, []);
 
+  // Pre-seed initial architecture library if Firestore library is empty on first open
+  useEffect(() => {
+    if (!excalidrawAPI) return;
+    LibraryFirebaseAdapter.load().then(async (data) => {
+      if (!data || !data.libraryItems || data.libraryItems.length === 0) {
+        try {
+          const res = await fetch("/libraries/software-architecture.excalidrawlib");
+          if (res.ok) {
+            const parsed = await res.json();
+            const items = parsed.library || parsed.libraryItems || [];
+            if (items.length > 0) {
+              await excalidrawAPI.updateLibrary({
+                libraryItems: items,
+                merge: true,
+              });
+            }
+          }
+        } catch {}
+      }
+    });
+  }, [excalidrawAPI]);
+
   const handleSaveToFirebase = useCallback(async () => {
     if (!excalidrawAPI || !activeDiagram) {
       return;
@@ -489,6 +522,7 @@ const ExcalidrawWrapper = () => {
     try {
       const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
       const appState = excalidrawAPI.getAppState();
+      const files = excalidrawAPI.getFiles();
 
       const res = await saveDiagramToFirebase({
         id: activeDiagram.id,
@@ -500,6 +534,7 @@ const ExcalidrawWrapper = () => {
           scrollX: appState.scrollX,
           scrollY: appState.scrollY,
         },
+        files,
         createdAt: activeDiagram.createdAt || Date.now(),
         updatedAt: Date.now(),
       });
@@ -558,6 +593,9 @@ const ExcalidrawWrapper = () => {
       lastSavedSceneVersionRef.current = getSceneVersion(diagram.elements || []);
       setSaveStatus("saved");
       if (excalidrawAPI) {
+        if (diagram.files && Object.keys(diagram.files).length > 0) {
+          excalidrawAPI.addFiles(diagram.files as any);
+        }
         excalidrawAPI.updateScene({
           elements: restoreElements(diagram.elements || [], null, {
             repairBindings: true,
@@ -580,6 +618,60 @@ const ExcalidrawWrapper = () => {
       handleSelectDiagram(newDiag);
     }
   }, [handleSelectDiagram]);
+
+  const handleInsertIcon = useCallback(
+    (icon: IconDef) => {
+      if (!excalidrawAPI) return;
+
+      const size = 64;
+      const svg = icon.getSvg(size);
+      const b64 = window.btoa(unescape(encodeURIComponent(svg)));
+      const dataURL = `data:image/svg+xml;base64,${b64}` as DataURL;
+      const fileId = `icon_${randomId()}` as FileId;
+
+      excalidrawAPI.addFiles([
+        {
+          id: fileId,
+          dataURL,
+          mimeType: "image/svg+xml",
+          created: Date.now(),
+        },
+      ]);
+
+      const appState = excalidrawAPI.getAppState();
+      const centerX =
+        -appState.scrollX + appState.width / 2 / appState.zoom.value - size / 2;
+      const centerY =
+        -appState.scrollY + appState.height / 2 / appState.zoom.value - size / 2;
+
+      const newElement = newImageElement({
+        type: "image",
+        x: Math.round(centerX),
+        y: Math.round(centerY),
+        width: size,
+        height: size,
+        fileId,
+        status: "saved",
+      });
+
+      const currentElements = excalidrawAPI.getSceneElementsIncludingDeleted();
+      excalidrawAPI.updateScene({
+        elements: [...currentElements, newElement],
+        appState: {
+          selectedElementIds: { [newElement.id]: true },
+        },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      });
+
+      setToast({
+        id: Date.now(),
+        type: "success",
+        message: `Added ${icon.title.split(" ")[0]} Icon`,
+        subMessage: `Positioned at center of canvas (${Math.round(centerX)}, ${Math.round(centerY)})`,
+      });
+    },
+    [excalidrawAPI],
+  );
 
   useEffect(() => {
     if (isDevEnv()) {
@@ -740,7 +832,7 @@ const ExcalidrawWrapper = () => {
             ...localDataState,
             captureUpdate: CaptureUpdateAction.NEVER,
           });
-          LibraryIndexedDBAdapter.load().then((data) => {
+          LibraryFirebaseAdapter.load().then((data) => {
             if (data) {
               excalidrawAPI.updateLibrary({
                 libraryItems: data.libraryItems,
@@ -1082,6 +1174,8 @@ const ExcalidrawWrapper = () => {
             onSave={handleSaveToFirebase}
             onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
             onQuickNew={handleQuickNew}
+            onOpenIcons={() => setIsIconPickerOpen(true)}
+            onOpenLibraries={() => setIsLibraryMarketplaceOpen(true)}
             isSidebarOpen={isSidebarOpen}
           />
         )}
@@ -1279,6 +1373,24 @@ const ExcalidrawWrapper = () => {
         activeDiagramId={activeDiagram?.id || null}
       />
       <ToastNotification toast={toast} onClose={() => setToast(null)} />
+      <IconPickerModal
+        isOpen={isIconPickerOpen}
+        onClose={() => setIsIconPickerOpen(false)}
+        onSelectIcon={handleInsertIcon}
+      />
+      <LibraryMarketplaceModal
+        isOpen={isLibraryMarketplaceOpen}
+        onClose={() => setIsLibraryMarketplaceOpen(false)}
+        excalidrawAPI={excalidrawAPI}
+        onSuccessToast={(msg) =>
+          setToast({
+            id: Date.now(),
+            type: "success",
+            message: "Library Saved to Firebase",
+            subMessage: msg,
+          })
+        }
+      />
     </div>
   );
 };

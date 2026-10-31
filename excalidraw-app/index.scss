@@ -1,5 +1,49 @@
 @import "../packages/excalidraw/css/variables.module.scss";
 
+@font-face {
+  font-family: "OnePlus Sans";
+  src: local("OnePlus Sans"), local("OnePlusSans"), local("OnePlus-Sans"),
+       url("/fonts/OnePlusSans/OnePlusSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  display: swap;
+}
+
+@font-face {
+  font-family: "OnePlus Sans";
+  src: local("OnePlus Sans Medium"), local("OnePlusSans-Medium"),
+       url("/fonts/OnePlusSans/OnePlusSans-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  display: swap;
+}
+
+@font-face {
+  font-family: "OnePlus Sans";
+  src: local("OnePlus Sans Bold"), local("OnePlusSans-Bold"),
+       url("/fonts/OnePlusSans/OnePlusSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  display: swap;
+}
+
+*, *::before, *::after {
+  font-family: "OnePlus Sans", "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+:root,
+body,
+.excalidraw,
+input,
+button,
+textarea,
+select,
+dialog,
+aside {
+  --ui-font: "OnePlus Sans", "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  font-family: var(--ui-font) !important;
+}
+
 .excalidraw {
   --color-primary-contrast-offset: #625ee0; // to offset Chubb illusion
 

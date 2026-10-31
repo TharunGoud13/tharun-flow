@@ -228,6 +228,7 @@ export const DiagramHistorySidebar: React.FC<Props> = ({
           transition: "transform 0.24s cubic-bezier(0.16, 1, 0.3, 1)",
           color: "var(--text-primary-color, #1e1e1e)",
           userSelect: "none",
+          fontFamily: "var(--ui-font)",
         }}
       >
         {/* Top Header */}
@@ -246,8 +247,8 @@ export const DiagramHistorySidebar: React.FC<Props> = ({
                 width: "32px",
                 height: "32px",
                 borderRadius: "8px",
-                backgroundColor: "var(--color-primary-light, #ffe3e3)",
-                color: "var(--color-primary, #e03131)",
+                backgroundColor: "var(--color-primary-light, #fff0f2)",
+                color: "var(--color-primary, #eb0029)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -308,9 +309,9 @@ export const DiagramHistorySidebar: React.FC<Props> = ({
               gap: "8px",
               padding: "9px 14px",
               borderRadius: "10px",
-              border: "1px solid var(--color-primary, #e03131)",
-              backgroundColor: "var(--color-primary-light, #fff5f5)",
-              color: "var(--color-primary, #e03131)",
+              border: "1px solid var(--color-primary, #eb0029)",
+              backgroundColor: "var(--color-primary-light, #fff0f2)",
+              color: "var(--color-primary, #eb0029)",
               cursor: "pointer",
               fontSize: "0.88rem",
               fontWeight: 600,
@@ -327,8 +328,8 @@ export const DiagramHistorySidebar: React.FC<Props> = ({
                 fontSize: "0.7rem",
                 padding: "2px 6px",
                 borderRadius: "4px",
-                backgroundColor: "rgba(224, 49, 49, 0.15)",
-                color: "var(--color-primary, #e03131)",
+                backgroundColor: "rgba(235, 0, 41, 0.12)",
+                color: "var(--color-primary, #eb0029)",
               }}
             >
               +
@@ -451,10 +452,10 @@ export const DiagramHistorySidebar: React.FC<Props> = ({
                         padding: "8px 10px",
                         borderRadius: "8px",
                         backgroundColor: isActive
-                          ? "var(--color-primary-light, #fff5f5)"
+                          ? "var(--color-primary-light, #fff0f2)"
                           : "transparent",
                         color: isActive
-                          ? "var(--color-primary, #e03131)"
+                          ? "var(--color-primary, #eb0029)"
                           : "var(--text-primary-color, #1e1e1e)",
                         cursor: isActionRunning ? "wait" : "pointer",
                         transition: "all 0.12s ease",
@@ -484,7 +485,7 @@ export const DiagramHistorySidebar: React.FC<Props> = ({
                               flex: 1,
                               padding: "4px 8px",
                               borderRadius: "5px",
-                              border: "1px solid var(--color-primary, #e03131)",
+                              border: "1px solid var(--color-primary, #eb0029)",
                               fontSize: "0.82rem",
                               fontWeight: 600,
                               outline: "none",
@@ -501,7 +502,7 @@ export const DiagramHistorySidebar: React.FC<Props> = ({
                               padding: "4px",
                               border: "none",
                               borderRadius: "4px",
-                              backgroundColor: "var(--color-primary, #e03131)",
+                              backgroundColor: "var(--color-primary, #eb0029)",
                               color: "#fff",
                               cursor: "pointer",
                               display: "flex",
@@ -543,7 +544,7 @@ export const DiagramHistorySidebar: React.FC<Props> = ({
                               strokeWidth={2}
                               style={{
                                 color: isActive
-                                  ? "var(--color-primary, #e03131)"
+                                  ? "var(--color-primary, #eb0029)"
                                   : "var(--text-secondary-color, #888)",
                                 flexShrink: 0,
                               }}
@@ -689,3 +690,4 @@ export const DiagramHistorySidebar: React.FC<Props> = ({
     </>
   );
 };
+
