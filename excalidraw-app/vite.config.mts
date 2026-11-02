@@ -249,9 +249,9 @@ export default defineConfig(({ mode }) => {
       checker({
         typescript: true,
         eslint:
-          envVars.VITE_APP_ENABLE_ESLINT === "false"
-            ? undefined
-            : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
+          envVars.VITE_APP_ENABLE_ESLINT === "true"
+            ? { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' }
+            : undefined,
         overlay: {
           initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
           badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",
