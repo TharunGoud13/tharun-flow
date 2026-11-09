@@ -1,66 +1,79 @@
-import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { WelcomeScreen } from "@excalidraw/excalidraw/index";
 import React from "react";
+import { Library, PanelLeft, Plus, Shapes } from "lucide-react";
+
+import { TharunFlowMark } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
+
+import "./AppWelcomeScreen.scss";
 
 export const AppWelcomeScreen: React.FC<{
   onCollabDialogOpen: () => any;
   isCollabEnabled: boolean;
+  onNewDiagram?: () => void;
+  onOpenHistory?: () => void;
+  onOpenIcons?: () => void;
+  onOpenLibraries?: () => void;
 }> = React.memo((props) => {
-  const { t } = useI18n();
-  const headingContent = (
-    <>
-      {t("welcomeScreen.app.center_heading")}
-      <br />
-      {t("welcomeScreen.app.center_heading_line2")}
-      <br />
-      {t("welcomeScreen.app.center_heading_line3")}
-    </>
-  );
-
   return (
     <WelcomeScreen>
-      <WelcomeScreen.Hints.MenuHint>
-        {t("welcomeScreen.app.menuHint")}
-      </WelcomeScreen.Hints.MenuHint>
+      <WelcomeScreen.Hints.MenuHint>⌘S to save</WelcomeScreen.Hints.MenuHint>
       <WelcomeScreen.Hints.ToolbarHint />
       <WelcomeScreen.Center>
         <WelcomeScreen.Center.Logo>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 12,
-              fontSize: 34,
-              fontWeight: 800,
-              letterSpacing: "-0.5px",
-              color: "#e03131",
-              fontFamily: "var(--ui-font)",
-              userSelect: "none",
-            }}
-          >
-            <svg
-              width="40"
-              height="40"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#e03131"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polygon points="12 2 2 7 12 12 22 7 12 2" />
-              <polyline points="2 17 12 22 22 17" />
-              <polyline points="2 12 12 17 22 12" />
-            </svg>
-            tharun-flow
+          <div className="tf-welcome-brand">
+            <TharunFlowMark className="tf-welcome-brand__mark" />
+            <span className="tf-welcome-brand__text">tharun-flow</span>
           </div>
         </WelcomeScreen.Center.Logo>
         <WelcomeScreen.Center.Heading>
-          {headingContent}
+          <span className="tf-welcome-heading">
+            <span className="tf-welcome-heading__title">
+              Diagrams that flow.
+            </span>
+            <span className="tf-welcome-heading__sub">
+              Sketch ideas, map systems, and ship clarity.
+            </span>
+          </span>
         </WelcomeScreen.Center.Heading>
         <WelcomeScreen.Center.Menu>
+          {props.onNewDiagram && (
+            <WelcomeScreen.Center.MenuItem
+              onSelect={props.onNewDiagram}
+              icon={<Plus size={18} />}
+            >
+              New diagram
+            </WelcomeScreen.Center.MenuItem>
+          )}
+          {props.onOpenHistory && (
+            <WelcomeScreen.Center.MenuItem
+              onSelect={props.onOpenHistory}
+              icon={<PanelLeft size={18} />}
+            >
+              Diagram history
+            </WelcomeScreen.Center.MenuItem>
+          )}
+          {props.onOpenIcons && (
+            <WelcomeScreen.Center.MenuItem
+              onSelect={props.onOpenIcons}
+              icon={<Shapes size={18} />}
+            >
+              Architecture & tech icons
+            </WelcomeScreen.Center.MenuItem>
+          )}
+          {props.onOpenLibraries && (
+            <WelcomeScreen.Center.MenuItem
+              onSelect={props.onOpenLibraries}
+              icon={<Library size={18} />}
+            >
+              Libraries
+            </WelcomeScreen.Center.MenuItem>
+          )}
           <WelcomeScreen.Center.MenuItemLoadScene />
+          {props.isCollabEnabled && (
+            <WelcomeScreen.Center.MenuItemLiveCollaborationTrigger
+              onSelect={props.onCollabDialogOpen}
+            />
+          )}
         </WelcomeScreen.Center.Menu>
       </WelcomeScreen.Center>
     </WelcomeScreen>

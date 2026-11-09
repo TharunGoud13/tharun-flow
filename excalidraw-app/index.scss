@@ -1,9 +1,10 @@
 @import "../packages/excalidraw/css/variables.module.scss";
+@import "./app-shell.scss";
 
 @font-face {
   font-family: "OnePlus Sans";
   src: local("OnePlus Sans"), local("OnePlusSans"), local("OnePlus-Sans"),
-       url("/fonts/OnePlusSans/OnePlusSans-Regular.ttf") format("truetype");
+    url("/fonts/OnePlusSans/OnePlusSans-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   display: swap;
@@ -12,7 +13,7 @@
 @font-face {
   font-family: "OnePlus Sans";
   src: local("OnePlus Sans Medium"), local("OnePlusSans-Medium"),
-       url("/fonts/OnePlusSans/OnePlusSans-Medium.ttf") format("truetype");
+    url("/fonts/OnePlusSans/OnePlusSans-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   display: swap;
@@ -21,14 +22,17 @@
 @font-face {
   font-family: "OnePlus Sans";
   src: local("OnePlus Sans Bold"), local("OnePlusSans-Bold"),
-       url("/fonts/OnePlusSans/OnePlusSans-Bold.ttf") format("truetype");
+    url("/fonts/OnePlusSans/OnePlusSans-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   display: swap;
 }
 
-*, *::before, *::after {
-  font-family: "OnePlus Sans", "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+*,
+*::before,
+*::after {
+  font-family: "OnePlus Sans", "Plus Jakarta Sans", system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
 }
 
 :root,
@@ -40,15 +44,16 @@ textarea,
 select,
 dialog,
 aside {
-  --ui-font: "OnePlus Sans", "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  --ui-font: "OnePlus Sans", "Plus Jakarta Sans", system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
   font-family: var(--ui-font) !important;
 }
 
 .excalidraw {
-  --color-primary-contrast-offset: #625ee0; // to offset Chubb illusion
+  --color-primary-contrast-offset: #0a6fd8; // to offset Chubb illusion
 
   &.theme--dark {
-    --color-primary-contrast-offset: #726dff; // to offset Chubb illusion
+    --color-primary-contrast-offset: #4aa8ff; // to offset Chubb illusion
   }
 
   .footer-center {
@@ -131,10 +136,10 @@ aside {
 }
 
 .plus-banner {
-  --plus-banner-bg: #f0efff;
+  --plus-banner-bg: #eef5ff;
   --plus-banner-bg-hover: var(--color-primary-light);
   --plus-banner-border: var(--color-primary-light-darker);
-  --plus-banner-subtitle: #8b88e0;
+  --plus-banner-subtitle: #5b90c9;
 
   display: flex;
   align-items: center;
@@ -195,8 +200,8 @@ aside {
 
 .theme--dark {
   .plus-banner {
-    --plus-banner-bg: #2b2a40;
-    --plus-banner-border: #4f4d6f;
-    --plus-banner-subtitle: #8f8cc4;
+    --plus-banner-bg: #102a43;
+    --plus-banner-border: #1d4a75;
+    --plus-banner-subtitle: #7fb3e0;
   }
 }

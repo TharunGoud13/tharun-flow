@@ -1,0 +1,59 @@
+/**
+ * Host application shell tokens.
+ *
+ * These live on `.excalidraw-app` (the host root) rather than on `.excalidraw`
+ * so that chrome rendered outside the editor — top bar, history panel, toasts,
+ * dialogs — is themed consistently in both light and dark mode.
+ */
+.excalidraw-app {
+  --tf-topbar-height: 56px;
+  --tf-sidebar-width: 300px;
+
+  --tf-topbar-bg: rgba(255, 255, 255, 0.86);
+  --tf-backdrop: rgba(0, 0, 0, 0.24);
+
+  --tf-shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.04);
+  --tf-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --tf-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  --tf-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --zIndex-app-chrome: 180;
+
+  box-sizing: border-box;
+  height: 100%;
+  padding-top: var(--tf-topbar-height);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--default-bg-color, #ffffff);
+  color: var(--text-primary-color, #1d1d1f);
+}
+
+.excalidraw-app.theme--dark {
+  --tf-topbar-bg: rgba(28, 28, 30, 0.82);
+  --tf-backdrop: rgba(0, 0, 0, 0.55);
+
+  --tf-shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.3);
+  --tf-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --tf-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.excalidraw-app__canvas {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+
+.excalidraw-app__canvas > .excalidraw {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Keep the editor's floating chrome visually aligned with the new top bar. */
+.excalidraw-app {
+  .main-menu-trigger {
+    border-radius: 10px;
+  }
+}

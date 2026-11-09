@@ -1,0 +1,115 @@
+.tf-toast {
+  position: fixed;
+  top: calc(var(--tf-topbar-height, 56px) + 14px);
+  left: 50%;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 280px;
+  max-width: min(440px, calc(100vw - 28px));
+  box-sizing: border-box;
+  padding: 10px 12px 10px 14px;
+  background: var(--island-bg-color, #ffffff);
+  border: 1px solid var(--default-border-color, #e3e3e8);
+  border-radius: 13px;
+  box-shadow: var(--tf-shadow-lg, 0 24px 64px rgba(0, 0, 0, 0.16));
+  color: var(--text-primary-color, #1d1d1f);
+  font-family: var(--ui-font);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  opacity: 0;
+  transform: translate(-50%, -8px) scale(0.98);
+  animation: tf-toast-in 0.28s var(--tf-ease, ease) forwards;
+}
+
+.tf-toast__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.tf-toast--success .tf-toast__icon {
+  color: var(--color-success-contrast, #34c759);
+}
+
+.tf-toast--error {
+  border-color: rgba(255, 59, 48, 0.28);
+}
+
+.tf-toast--error .tf-toast__icon {
+  color: var(--color-danger, #ff3b30);
+}
+
+.tf-toast--info .tf-toast__icon {
+  color: var(--color-primary, #0071e3);
+}
+
+.tf-toast__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.tf-toast__message {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tf-toast--error .tf-toast__message {
+  color: var(--color-danger, #ff3b30);
+}
+
+.tf-toast__sub {
+  font-size: 11.5px;
+  font-weight: 450;
+  line-height: 1.35;
+  color: var(--text-secondary-color, #6e6e73);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tf-toast__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary-color, #6e6e73);
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+
+  &:hover {
+    background: var(--color-surface-mid, #f2f2f5);
+    color: var(--text-primary-color, #1d1d1f);
+  }
+}
+
+@keyframes tf-toast-in {
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tf-toast {
+    animation: none;
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

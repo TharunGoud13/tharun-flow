@@ -1,19 +1,51 @@
 import "./ExcalidrawLogo.scss";
 
-const LogoIcon = () => (
+/**
+ * tharun-flow brand mark.
+ *
+ * A minimal flow glyph (one source node branching into two) on a rounded
+ * square. Designed to stay crisp from favicon size up to the welcome screen.
+ */
+export const TharunFlowMark = ({
+  size,
+  className,
+  style,
+}: {
+  size?: number | string;
+  className?: string;
+  style?: React.CSSProperties;
+}) => (
   <svg
+    width={size}
+    height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke="currentColor"
-    strokeWidth="2.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="ExcalidrawLogo-icon"
-    style={{ width: "1.75em", height: "1.75em", color: "var(--color-primary)" }}
+    className={className}
+    style={style}
+    role="img"
+    aria-label="tharun-flow"
   >
-    <polygon points="12 2 2 7 12 12 22 7 12 2" />
-    <polyline points="2 17 12 22 22 17" />
-    <polyline points="2 12 12 17 22 12" />
+    <rect
+      width="24"
+      height="24"
+      rx="6.5"
+      fill="var(--tf-brand, var(--color-primary, #0071e3))"
+    />
+    <path
+      d="M7.2 12h3.1c1.7 0 3.1-1.4 3.1-3.1V7.4c0-1.2 1-2.2 2.2-2.2h1.6"
+      stroke="#fff"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+    />
+    <path
+      d="M7.2 12h3.1c1.7 0 3.1 1.4 3.1 3.1v1.5c0 1.2 1 2.2 2.2 2.2h1.6"
+      stroke="#fff"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+    />
+    <circle cx="6.4" cy="12" r="1.55" fill="#fff" />
+    <circle cx="18.4" cy="5.2" r="1.55" fill="#fff" />
+    <circle cx="18.4" cy="18.8" r="1.55" fill="#fff" />
   </svg>
 );
 
@@ -22,11 +54,11 @@ const LogoText = () => (
     className="ExcalidrawLogo-text"
     style={{
       fontFamily: "var(--ui-font, sans-serif)",
-      fontWeight: 800,
+      fontWeight: 650,
       fontSize: "1.35em",
-      letterSpacing: "-0.5px",
-      color: "var(--color-primary)",
-      marginLeft: "6px",
+      letterSpacing: "-0.035em",
+      color: "var(--color-logo-text)",
+      marginLeft: "0.6em",
       display: "inline-block",
     }}
   >
@@ -55,7 +87,7 @@ export const ExcalidrawLogo = ({
 }: LogoProps) => {
   return (
     <div className={`ExcalidrawLogo is-${size}`} style={style}>
-      <LogoIcon />
+      <TharunFlowMark className="ExcalidrawLogo-icon" />
       {withText && <LogoText />}
     </div>
   );

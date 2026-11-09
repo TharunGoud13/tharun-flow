@@ -11,7 +11,9 @@ import {
   Check,
 } from "lucide-react";
 
-import { ALL_ICONS, IconDef } from "./iconData";
+import { ALL_ICONS } from "./iconData";
+
+import type { IconDef } from "./iconData";
 
 interface Props {
   isOpen: boolean;
@@ -62,8 +64,12 @@ export const IconPickerModal: React.FC<Props> = ({
     return ALL_ICONS.filter((icon) => {
       const matchCat =
         activeCategory === "all" || icon.category === activeCategory;
-      if (!matchCat) return false;
-      if (!q) return true;
+      if (!matchCat) {
+        return false;
+      }
+      if (!q) {
+        return true;
+      }
 
       return (
         icon.title.toLowerCase().includes(q) ||
@@ -80,7 +86,9 @@ export const IconPickerModal: React.FC<Props> = ({
     }, 1500);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div
@@ -104,7 +112,7 @@ export const IconPickerModal: React.FC<Props> = ({
           maxWidth: "680px",
           maxHeight: "85vh",
           backgroundColor: "var(--color-surface-lowest, #ffffff)",
-          color: "var(--color-on-surface, #212529)",
+          color: "var(--color-on-surface, var(--color-on-surface))",
           borderRadius: "16px",
           boxShadow:
             "0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.08)",
@@ -131,8 +139,8 @@ export const IconPickerModal: React.FC<Props> = ({
                 width: "36px",
                 height: "36px",
                 borderRadius: "10px",
-                backgroundColor: "#fff0f2",
-                color: "#eb0029",
+                backgroundColor: "var(--color-primary-light)",
+                color: "var(--color-primary)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -146,7 +154,7 @@ export const IconPickerModal: React.FC<Props> = ({
                   margin: 0,
                   fontSize: "17px",
                   fontWeight: 700,
-                  color: "var(--color-on-surface, #212529)",
+                  color: "var(--color-on-surface, var(--color-on-surface))",
                   letterSpacing: "-0.2px",
                 }}
               >
@@ -156,7 +164,7 @@ export const IconPickerModal: React.FC<Props> = ({
                 style={{
                   margin: "2px 0 0",
                   fontSize: "12px",
-                  color: "#868e96",
+                  color: "var(--text-secondary-color)",
                 }}
               >
                 Click any icon to place it instantly onto your canvas
@@ -171,7 +179,7 @@ export const IconPickerModal: React.FC<Props> = ({
             style={{
               border: "none",
               background: "transparent",
-              color: "#868e96",
+              color: "var(--text-secondary-color)",
               cursor: "pointer",
               padding: "6px",
               borderRadius: "8px",
@@ -181,7 +189,8 @@ export const IconPickerModal: React.FC<Props> = ({
               transition: "background-color 0.15s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#f1f3f5";
+              e.currentTarget.style.backgroundColor =
+                "var(--color-surface-high)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "transparent";
@@ -209,7 +218,7 @@ export const IconPickerModal: React.FC<Props> = ({
               transition: "border-color 0.15s ease",
             }}
           >
-            <Search size={18} color="#adb5bd" />
+            <Search size={18} color="var(--text-secondary-color)" />
             <input
               ref={searchInputRef}
               type="text"
@@ -234,7 +243,7 @@ export const IconPickerModal: React.FC<Props> = ({
                   border: "none",
                   background: "transparent",
                   cursor: "pointer",
-                  color: "#adb5bd",
+                  color: "var(--text-secondary-color)",
                   padding: "2px",
                   display: "flex",
                 }}
@@ -272,10 +281,14 @@ export const IconPickerModal: React.FC<Props> = ({
                   fontSize: "12.5px",
                   fontWeight: isActive ? 600 : 500,
                   border: isActive
-                    ? "1px solid #eb0029"
+                    ? "1px solid var(--color-primary)"
                     : "1px solid var(--color-surface-low, #e9ecef)",
-                  backgroundColor: isActive ? "#fff0f2" : "transparent",
-                  color: isActive ? "#eb0029" : "#495057",
+                  backgroundColor: isActive
+                    ? "var(--color-primary-light)"
+                    : "transparent",
+                  color: isActive
+                    ? "var(--color-primary)"
+                    : "var(--color-on-surface)",
                   cursor: "pointer",
                   whiteSpace: "nowrap",
                   transition: "all 0.15s ease",
@@ -305,14 +318,17 @@ export const IconPickerModal: React.FC<Props> = ({
                 gridColumn: "1 / -1",
                 textAlign: "center",
                 padding: "40px 20px",
-                color: "#868e96",
+                color: "var(--text-secondary-color)",
               }}
             >
-              <p style={{ margin: "0 0 6px", fontSize: "15px", fontWeight: 600 }}>
+              <p
+                style={{ margin: "0 0 6px", fontSize: "15px", fontWeight: 600 }}
+              >
                 No icons found
               </p>
               <p style={{ margin: 0, fontSize: "13px" }}>
-                Try searching for something else like "cloud", "database", or "server"
+                Try searching for something else like "cloud", "database", or
+                "server"
               </p>
             </div>
           ) : (
@@ -333,10 +349,10 @@ export const IconPickerModal: React.FC<Props> = ({
                     padding: "14px 6px 10px",
                     borderRadius: "12px",
                     border: isInserted
-                      ? "1.5px solid #2b8a3e"
+                      ? "1.5px solid var(--color-success-text)"
                       : "1px solid var(--color-surface-low, #e9ecef)",
                     backgroundColor: isInserted
-                      ? "#ebfbee"
+                      ? "var(--color-success)"
                       : "var(--color-surface-lowest, #ffffff)",
                     cursor: "pointer",
                     transition: "all 0.15s ease",
@@ -344,8 +360,10 @@ export const IconPickerModal: React.FC<Props> = ({
                   }}
                   onMouseEnter={(e) => {
                     if (!isInserted) {
-                      e.currentTarget.style.borderColor = "#eb0029";
-                      e.currentTarget.style.backgroundColor = "#fff0f2";
+                      e.currentTarget.style.borderColor =
+                        "var(--color-primary)";
+                      e.currentTarget.style.backgroundColor =
+                        "var(--color-primary-light)";
                       e.currentTarget.style.transform = "translateY(-2px)";
                       e.currentTarget.style.boxShadow =
                         "0 4px 12px rgba(235, 0, 41, 0.12)";
@@ -372,7 +390,11 @@ export const IconPickerModal: React.FC<Props> = ({
                     }}
                   >
                     {isInserted ? (
-                      <Check size={26} color="#2b8a3e" strokeWidth={2.5} />
+                      <Check
+                        size={26}
+                        color="var(--color-success-text)"
+                        strokeWidth={2.5}
+                      />
                     ) : (
                       <div
                         dangerouslySetInnerHTML={{
@@ -392,7 +414,9 @@ export const IconPickerModal: React.FC<Props> = ({
                     style={{
                       fontSize: "11px",
                       fontWeight: 500,
-                      color: isInserted ? "#2b8a3e" : "#495057",
+                      color: isInserted
+                        ? "var(--color-success-text)"
+                        : "var(--color-on-surface)",
                       textAlign: "center",
                       lineHeight: "1.2",
                       maxWidth: "88px",
@@ -419,14 +443,14 @@ export const IconPickerModal: React.FC<Props> = ({
             alignItems: "center",
             justifyContent: "space-between",
             fontSize: "12px",
-            color: "#868e96",
+            color: "var(--text-secondary-color)",
           }}
         >
           <span>
             Showing {filteredIcons.length} of {ALL_ICONS.length} icons
           </span>
-          <span style={{ fontWeight: 500, color: "#eb0029" }}>
-            tharun-flow Component Library
+          <span style={{ fontWeight: 500, color: "var(--color-primary)" }}>
+            tharun-flow component library
           </span>
         </div>
       </div>

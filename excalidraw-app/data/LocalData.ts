@@ -45,6 +45,10 @@ import { FileManager } from "./FileManager";
 import { FileStatusStore } from "./fileStatusStore";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
+import {
+  loadLibrariesFromFirebase,
+  saveLibrariesToFirebase,
+} from "./firebaseLibraryStorage";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -233,10 +237,6 @@ export class LocalData {
     },
   });
 }
-import {
-  loadLibrariesFromFirebase,
-  saveLibrariesToFirebase,
-} from "./firebaseLibraryStorage";
 
 export class LibraryIndexedDBAdapter {
   /** IndexedDB database and store name */
@@ -273,7 +273,9 @@ export class LibraryIndexedDBAdapter {
  * across all user devices seamlessly.
  */
 export class LibraryFirebaseAdapter {
-  static async load(metadata?: { source: "load" | "save" }): Promise<LibraryPersistedData | null> {
+  static async load(metadata?: {
+    source: "load" | "save";
+  }): Promise<LibraryPersistedData | null> {
     // 1. Primary: load from Firebase Firestore for cross-device sync
     try {
       const fbItems = await loadLibrariesFromFirebase();
@@ -291,7 +293,11 @@ export class LibraryFirebaseAdapter {
     // 2. Fallback: local IndexedDB
     try {
       const localData = await LibraryIndexedDBAdapter.load();
-      if (localData && localData.libraryItems && localData.libraryItems.length > 0) {
+      if (
+        localData &&
+        localData.libraryItems &&
+        localData.libraryItems.length > 0
+      ) {
         // Asynchronously sync local libraries up to Firebase
         saveLibrariesToFirebase(localData.libraryItems).catch(() => {});
         return localData;

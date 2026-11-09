@@ -1,7 +1,7 @@
-import { loadFirestore } from "./firebase";
-
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
+
+import { loadFirestore } from "./firebase";
 
 export interface FirebaseDiagramMetadata {
   id: string;
@@ -46,7 +46,9 @@ const getDiagramDocId = (id: string) => `tharun_flow_diagram_${id}`;
 /**
  * List all saved diagrams from Firebase Firestore index table.
  */
-export const listFirebaseDiagrams = async (): Promise<FirebaseDiagramMetadata[]> => {
+export const listFirebaseDiagrams = async (): Promise<
+  FirebaseDiagramMetadata[]
+> => {
   try {
     const { firestore, doc, getDoc } = await loadFirestore();
     const idxDocRef = doc(firestore, COLLECTION_NAME, INDEX_DOC_ID);
@@ -237,10 +239,14 @@ export const renameFirebaseDiagram = async (
 ): Promise<boolean> => {
   try {
     const trimmed = newName.trim();
-    if (!trimmed) return false;
+    if (!trimmed) {
+      return false;
+    }
 
     const existing = await loadFirebaseDiagram(id);
-    if (!existing) return false;
+    if (!existing) {
+      return false;
+    }
 
     existing.name = trimmed;
     const result = await saveDiagramToFirebase(existing);
@@ -281,7 +287,9 @@ export const duplicateFirebaseDiagram = async (
 /**
  * Create a new blank diagram model (ready to be edited and saved to Firebase).
  */
-export const createNewDiagramRecord = (name?: string): FirebaseDiagramRecord => {
+export const createNewDiagramRecord = (
+  name?: string,
+): FirebaseDiagramRecord => {
   const id = `diag_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   return {
     id,
@@ -338,4 +346,3 @@ export const initFirebaseDiagramStorage = async (
   await saveDiagramToFirebase(initial);
   return initial;
 };
-

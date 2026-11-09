@@ -1,0 +1,307 @@
+.tf-topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--zIndex-app-chrome, 180);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  height: var(--tf-topbar-height, 56px);
+  box-sizing: border-box;
+  padding: 0 14px 0 16px;
+  background: var(--tf-topbar-bg, rgba(255, 255, 255, 0.86));
+  border-bottom: 1px solid var(--default-border-color, #e3e3e8);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  color: var(--text-primary-color, #1d1d1f);
+  font-family: var(--ui-font);
+  user-select: none;
+}
+
+.tf-topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.tf-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.tf-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 0 auto;
+}
+
+.tf-brand__mark {
+  width: 24px;
+  height: 24px;
+  display: block;
+  border-radius: 6.5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.tf-brand__wordmark {
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  color: var(--text-primary-color, #1d1d1f);
+  line-height: 1;
+}
+
+.tf-topbar__divider {
+  width: 1px;
+  height: 18px;
+  background: var(--default-border-color, #e3e3e8);
+  flex: 0 0 auto;
+  margin: 0 2px;
+}
+
+.tf-doc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  max-width: 320px;
+  height: 32px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary-color, #1d1d1f);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.tf-doc-btn:hover {
+  background: var(--color-surface-mid, #f2f2f5);
+}
+
+.tf-doc-btn:active {
+  background: var(--color-surface-high, #e9e9ee);
+}
+
+.tf-doc-btn__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tf-doc-btn__chevron {
+  flex: 0 0 auto;
+  opacity: 0.45;
+}
+
+.tf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 11px;
+  border: 1px solid var(--default-border-color, #e3e3e8);
+  border-radius: 8px;
+  background: var(--island-bg-color, #ffffff);
+  color: var(--text-primary-color, #1d1d1f);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 550;
+  letter-spacing: -0.005em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--tf-shadow-sm, 0 1px 1px rgba(0, 0, 0, 0.04));
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.tf-btn:hover {
+  background: var(--color-surface-mid, #f2f2f5);
+}
+
+.tf-btn:active {
+  background: var(--color-surface-high, #e9e9ee);
+}
+
+.tf-btn:focus-visible {
+  outline: 3px solid rgba(0, 113, 227, 0.28);
+  outline-offset: 2px;
+}
+
+.tf-btn:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.tf-btn--ghost {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-secondary-color, #6e6e73);
+}
+
+.tf-btn--ghost:hover {
+  background: var(--color-surface-mid, #f2f2f5);
+  color: var(--text-primary-color, #1d1d1f);
+}
+
+.tf-btn--ghost.is-active {
+  background: var(--color-primary-light, #eef5ff);
+  color: var(--color-primary, #0071e3);
+}
+
+.tf-btn--icon {
+  width: 32px;
+  padding: 0;
+}
+
+.tf-btn__label {
+  display: inline-block;
+}
+
+/* Save: the only high-emphasis action, and only when there's work to save. */
+.tf-save-btn.is-saved,
+.tf-save-btn.is-saving {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-secondary-color, #6e6e73);
+}
+
+.tf-save-btn.is-saved:hover,
+.tf-save-btn.is-saving:hover {
+  background: var(--color-surface-mid, #f2f2f5);
+  color: var(--text-primary-color, #1d1d1f);
+}
+
+.tf-save-btn__check {
+  color: var(--color-success-contrast, #34c759);
+}
+
+.tf-save-btn.is-unsaved {
+  border-color: var(--color-primary, #0071e3);
+  background: var(--color-primary, #0071e3);
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 113, 227, 0.35);
+}
+
+.tf-save-btn.is-unsaved:hover {
+  border-color: var(--color-primary-hover, #0077ed);
+  background: var(--color-primary-hover, #0077ed);
+}
+
+.tf-save-btn.is-error {
+  border-color: rgba(255, 59, 48, 0.35);
+  background: var(--color-danger-background, #fff1f0);
+  color: var(--color-danger, #ff3b30);
+  box-shadow: none;
+}
+
+.tf-text-danger {
+  color: var(--color-danger, #ff3b30);
+}
+
+.tf-spin {
+  animation: tf-spin 0.8s linear infinite;
+}
+
+@keyframes tf-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1120px) {
+  .tf-topbar__right .tf-btn--ghost .tf-btn__label {
+    display: none;
+  }
+
+  .tf-topbar__right .tf-btn--ghost {
+    width: 32px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 860px) {
+  .tf-brand__wordmark {
+    display: none;
+  }
+
+  .tf-doc-btn {
+    max-width: 210px;
+  }
+
+  .tf-topbar {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 680px) {
+  .tf-doc-btn {
+    max-width: 150px;
+  }
+
+  .tf-topbar__right .tf-btn:not(.tf-save-btn) .tf-btn__label {
+    display: none;
+  }
+
+  .tf-topbar__right .tf-btn:not(.tf-save-btn) {
+    width: 32px;
+    padding: 0;
+  }
+
+  .tf-topbar__divider {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .tf-topbar__right .tf-btn--icons,
+  .tf-topbar__right .tf-btn--libraries {
+    display: none;
+  }
+
+  .tf-topbar__left .tf-topbar__divider {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .tf-topbar {
+    padding: 0 10px 0 12px;
+  }
+
+  .tf-doc-btn {
+    max-width: 120px;
+  }
+
+  .tf-save-btn .tf-btn__label {
+    display: none;
+  }
+
+  .tf-save-btn {
+    width: 32px;
+    padding: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tf-btn,
+  .tf-doc-btn,
+  .tf-spin {
+    transition: none;
+    animation: none;
+  }
+}

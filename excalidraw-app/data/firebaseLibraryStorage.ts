@@ -1,7 +1,9 @@
-import { loadFirestore } from "./firebase";
 import { restoreLibraryItems } from "@excalidraw/excalidraw/data/restore";
+
 import type { LibraryItems } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
+import { loadFirestore } from "./firebase";
 
 const COLLECTION_NAME = "scenes";
 const META_DOC_ID = "tharun_flow_libraries_meta";
@@ -17,55 +19,64 @@ export interface LibraryMetaRecord {
 /**
  * Loads all library items from Firebase Firestore chunks.
  */
-export const loadLibrariesFromFirebase = async (): Promise<LibraryItems | null> => {
-  try {
-    const { firestore, doc, getDoc } = await loadFirestore();
-    const metaRef = doc(firestore, COLLECTION_NAME, META_DOC_ID);
-    const metaSnap = await getDoc(metaRef);
+export const loadLibrariesFromFirebase =
+  async (): Promise<LibraryItems | null> => {
+    try {
+      const { firestore, doc, getDoc } = await loadFirestore();
+      const metaRef = doc(firestore, COLLECTION_NAME, META_DOC_ID);
+      const metaSnap = await getDoc(metaRef);
 
-    if (!metaSnap.exists()) {
-      return null;
-    }
+      if (!metaSnap.exists()) {
+        return null;
+      }
 
-    const meta = metaSnap.data() as LibraryMetaRecord;
-    if (!meta || !meta.chunksCount || meta.chunksCount === 0) {
-      return null;
-    }
+      const meta = metaSnap.data() as LibraryMetaRecord;
+      if (!meta || !meta.chunksCount || meta.chunksCount === 0) {
+        return null;
+      }
 
-    const chunkPromises: Promise<any>[] = [];
-    for (let i = 0; i < meta.chunksCount; i++) {
-      const chunkRef = doc(firestore, COLLECTION_NAME, `${CHUNK_DOC_PREFIX}${i}`);
-      chunkPromises.push(getDoc(chunkRef));
-    }
+      const chunkPromises: Promise<any>[] = [];
+      for (let i = 0; i < meta.chunksCount; i++) {
+        const chunkRef = doc(
+          firestore,
+          COLLECTION_NAME,
+          `${CHUNK_DOC_PREFIX}${i}`,
+        );
+        chunkPromises.push(getDoc(chunkRef));
+      }
 
-    const chunkSnaps = await Promise.all(chunkPromises);
-    const allItems: any[] = [];
+      const chunkSnaps = await Promise.all(chunkPromises);
+      const allItems: any[] = [];
 
-    for (const snap of chunkSnaps) {
-      if (snap.exists()) {
-        const chunkData = snap.data();
-        if (chunkData && Array.isArray(chunkData.items)) {
-          allItems.push(...chunkData.items);
+      for (const snap of chunkSnaps) {
+        if (snap.exists()) {
+          const chunkData = snap.data();
+          if (chunkData && Array.isArray(chunkData.items)) {
+            allItems.push(...chunkData.items);
+          }
         }
       }
-    }
 
-    if (allItems.length === 0) {
+      if (allItems.length === 0) {
+        return null;
+      }
+
+      return restoreLibraryItems(allItems, "published");
+    } catch (err) {
+      console.warn("Failed to load libraries from Firebase:", err);
       return null;
     }
-
-    return restoreLibraryItems(allItems, "published");
-  } catch (err) {
-    console.warn("Failed to load libraries from Firebase:", err);
-    return null;
-  }
-};
+  };
 
 /**
  * Saves all library items to Firebase Firestore in chunked documents.
  */
-export const saveLibrariesToFirebase = async (items: LibraryItems): Promise<void> => {
-  if (!items) return;
+export const saveLibrariesToFirebase = async (
+  items: LibraryItems,
+): Promise<void> => {
+  if (!items) {
+    return;
+  }
   try {
     const { firestore, doc, setDoc, deleteDoc, getDoc } = await loadFirestore();
 
@@ -75,7 +86,8 @@ export const saveLibrariesToFirebase = async (items: LibraryItems): Promise<void
       const metaRef = doc(firestore, COLLECTION_NAME, META_DOC_ID);
       const metaSnap = await getDoc(metaRef);
       if (metaSnap.exists()) {
-        prevChunksCount = (metaSnap.data() as LibraryMetaRecord)?.chunksCount || 0;
+        prevChunksCount =
+          (metaSnap.data() as LibraryMetaRecord)?.chunksCount || 0;
       }
     } catch {}
 
@@ -84,7 +96,11 @@ export const saveLibrariesToFirebase = async (items: LibraryItems): Promise<void
 
     for (let i = 0; i < chunksCount; i++) {
       const chunkItems = items.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-      const chunkRef = doc(firestore, COLLECTION_NAME, `${CHUNK_DOC_PREFIX}${i}`);
+      const chunkRef = doc(
+        firestore,
+        COLLECTION_NAME,
+        `${CHUNK_DOC_PREFIX}${i}`,
+      );
       writePromises.push(
         setDoc(chunkRef, {
           items: chunkItems,
@@ -97,7 +113,11 @@ export const saveLibrariesToFirebase = async (items: LibraryItems): Promise<void
     // Delete obsolete chunks if library shrunk
     if (prevChunksCount > chunksCount) {
       for (let i = chunksCount; i < prevChunksCount; i++) {
-        const chunkRef = doc(firestore, COLLECTION_NAME, `${CHUNK_DOC_PREFIX}${i}`);
+        const chunkRef = doc(
+          firestore,
+          COLLECTION_NAME,
+          `${CHUNK_DOC_PREFIX}${i}`,
+        );
         writePromises.push(deleteDoc(chunkRef).catch(() => {}));
       }
     }
@@ -135,7 +155,8 @@ export const CURATED_LIBRARIES: CuratedLibraryDef[] = [
   {
     id: "software-architecture",
     name: "Software Architecture",
-    description: "Microservices, databases, caches, message queues, code/docs, browser, and mobile devices.",
+    description:
+      "Microservices, databases, caches, message queues, code/docs, browser, and mobile devices.",
     category: "architecture",
     author: "Youri Tjang",
     url: "/libraries/software-architecture.excalidrawlib",
@@ -144,7 +165,8 @@ export const CURATED_LIBRARIES: CuratedLibraryDef[] = [
   {
     id: "aws-serverless",
     name: "AWS Serverless Icons",
-    description: "Lambda, API Gateway, DynamoDB, S3, EventBridge, SNS, SQS, CloudFront, Cognito, and Step Functions.",
+    description:
+      "Lambda, API Gateway, DynamoDB, S3, EventBridge, SNS, SQS, CloudFront, Cognito, and Step Functions.",
     category: "cloud",
     author: "Slobodan Stojanović",
     url: "/libraries/aws-serverless.excalidrawlib",
@@ -153,7 +175,8 @@ export const CURATED_LIBRARIES: CuratedLibraryDef[] = [
   {
     id: "aws-simple-icons",
     name: "AWS Simple Icons",
-    description: "Monochrome & color cloud icons for EC2, RDS, S3, SQS, and Lambda.",
+    description:
+      "Monochrome & color cloud icons for EC2, RDS, S3, SQS, and Lambda.",
     category: "cloud",
     author: "Husain Khambaty",
     url: "/libraries/aws-simple-icons.excalidrawlib",
@@ -162,7 +185,8 @@ export const CURATED_LIBRARIES: CuratedLibraryDef[] = [
   {
     id: "azure-cloud-services",
     name: "Azure Cloud Services",
-    description: "App Service, Azure SQL, CosmosDB, Blob Storage, Functions, and AKS container services.",
+    description:
+      "App Service, Azure SQL, CosmosDB, Blob Storage, Functions, and AKS container services.",
     category: "cloud",
     author: "Youri Tjang",
     url: "/libraries/azure-cloud-services.excalidrawlib",
@@ -171,7 +195,8 @@ export const CURATED_LIBRARIES: CuratedLibraryDef[] = [
   {
     id: "technology-logos",
     name: "Cloud-Native Tech Logos",
-    description: "Kubernetes, Docker, Git, Terraform, Kafka, Spring, Redis, Knative, OpenStack, and Kotlin.",
+    description:
+      "Kubernetes, Docker, Git, Terraform, Kafka, Spring, Redis, Knative, OpenStack, and Kotlin.",
     category: "tech",
     author: "Matthias Haeussler",
     url: "/libraries/technology-logos.excalidrawlib",
@@ -180,7 +205,8 @@ export const CURATED_LIBRARIES: CuratedLibraryDef[] = [
   {
     id: "software-logos",
     name: "Software & System Logos",
-    description: "Postgres, NGINX, RabbitMQ, Redis, Load Balancer, Reverse Proxy, Server, Chip, and DB.",
+    description:
+      "Postgres, NGINX, RabbitMQ, Redis, Load Balancer, Reverse Proxy, Server, Chip, and DB.",
     category: "tech",
     author: "drwnio",
     url: "/libraries/software-logos.excalidrawlib",
@@ -189,7 +215,8 @@ export const CURATED_LIBRARIES: CuratedLibraryDef[] = [
   {
     id: "uml-er-diagrams",
     name: "UML & ER Diagrams",
-    description: "Components for UML class diagrams, database schemas, entities, relationships, and connectors.",
+    description:
+      "Components for UML class diagrams, database schemas, entities, relationships, and connectors.",
     category: "diagrams",
     author: "BjoernKW",
     url: "/libraries/uml-er-diagrams.excalidrawlib",
@@ -198,7 +225,8 @@ export const CURATED_LIBRARIES: CuratedLibraryDef[] = [
   {
     id: "cloud-design-patterns",
     name: "Cloud Design Patterns",
-    description: "Visual components for CQRS, Event Sourcing, Circuit Breaker, Ambassador, and Gateway routing.",
+    description:
+      "Visual components for CQRS, Event Sourcing, Circuit Breaker, Ambassador, and Gateway routing.",
     category: "architecture",
     author: "Michel Caradec",
     url: "/libraries/cloud-design-patterns.excalidrawlib",
@@ -207,7 +235,8 @@ export const CURATED_LIBRARIES: CuratedLibraryDef[] = [
   {
     id: "system-design-template",
     name: "System Design Template",
-    description: "Standard structure & process for high-level system design interviews and architectural flows.",
+    description:
+      "Standard structure & process for high-level system design interviews and architectural flows.",
     category: "architecture",
     author: "James Wiens",
     url: "/libraries/system-design-template.excalidrawlib",
@@ -216,7 +245,8 @@ export const CURATED_LIBRARIES: CuratedLibraryDef[] = [
   {
     id: "data-science",
     name: "Data Science & AI Logos",
-    description: "Airflow, Jupyter, Pandas, NumPy, TensorFlow, PyTorch, Scikit-learn, and Keras.",
+    description:
+      "Airflow, Jupyter, Pandas, NumPy, TensorFlow, PyTorch, Scikit-learn, and Keras.",
     category: "tech",
     author: "Fares Hasan",
     url: "/libraries/data-science.excalidrawlib",

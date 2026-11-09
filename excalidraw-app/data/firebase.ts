@@ -67,8 +67,24 @@ const _initializeFirebase = lazy(async () => {
 
 export const loadFirestore = lazy(async () => {
   const { sdk, app } = await _initializeFirebase();
-  const { getFirestore, doc, getDoc, setDoc, deleteDoc, runTransaction, Bytes } = sdk;
-  return { firestore: getFirestore(app), doc, getDoc, setDoc, deleteDoc, runTransaction, Bytes };
+  const {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    deleteDoc,
+    runTransaction,
+    Bytes,
+  } = sdk;
+  return {
+    firestore: getFirestore(app),
+    doc,
+    getDoc,
+    setDoc,
+    deleteDoc,
+    runTransaction,
+    Bytes,
+  };
 });
 
 const _loadStorage = lazy(async () => {

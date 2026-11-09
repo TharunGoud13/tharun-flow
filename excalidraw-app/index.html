@@ -9,28 +9,31 @@
     />
     <meta name="referrer" content="origin" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="theme-color" content="#e03131" />
+    <meta name="theme-color" content="#f5f5f7" />
 
     <!-- Primary Meta Tags -->
-    <meta
-      name="title"
-      content="tharun-flow — Diagramming & Flow Platform"
-    />
+    <meta name="title" content="tharun-flow — Diagramming & Flow Platform" />
     <meta
       name="description"
-      content="Visual whiteboard and diagramming platform."
+      content="A precise, fast canvas for architecture diagrams, flows and ideas."
     />
     <!-- Open Graph / Facebook -->
     <meta property="og:site_name" content="tharun-flow" />
     <meta property="og:type" content="website" />
-    <meta
-      property="og:title"
-      content="tharun-flow"
-    />
+    <meta property="og:title" content="tharun-flow" />
     <meta
       property="og:description"
-      content="Visual whiteboard and diagramming platform."
+      content="A precise, fast canvas for architecture diagrams, flows and ideas."
     />
+    <meta property="og:image" content="/og-image.png" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="tharun-flow" />
+    <meta
+      name="twitter:description"
+      content="A precise, fast canvas for architecture diagrams, flows and ideas."
+    />
+    <meta name="twitter:image" content="/og-image.png" />
 
     <!-- Warmup the connection for Google fonts & OnePlus Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -103,7 +106,7 @@
     </script>
     <style>
       html.dark {
-        background-color: #121212;
+        background-color: #000000;
         color: #fff;
       }
     </style>
@@ -114,25 +117,6 @@
 
     <!------------------------------------------------------------------------->
     <% if (typeof PROD != 'undefined' && PROD == true) { %>
-    <script>
-      // Redirect Excalidraw+ users which have auto-redirect enabled.
-      //
-      // Redirect only the bare root path, so link/room/library urls are not
-      // redirected.
-      //
-      // Putting into index.html for best performance (can't redirect on server
-      // due to location.hash checks).
-      if (
-        window.location.pathname === "/" &&
-        !window.location.hash &&
-        !window.location.search &&
-        // if its present redirect
-        document.cookie.includes("excplus-autoredirect=true")
-      ) {
-        window.location.href = "https://app.excalidraw.com";
-      }
-    </script>
-
     <!-- Following placeholder is replaced during the build step -->
     <!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->
 
@@ -150,10 +134,11 @@
     <% } %>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 
-    <!-- Excalidraw version -->
+    <!-- tharun-flow version -->
     <meta name="version" content="{version}" />
 
     <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD != 'undefined' &&
@@ -174,8 +159,8 @@
     </script>
     <% } %>
     <script>
-      // setting this so that libraries installation reuses this window tab.
-      window.name = "_excalidraw";
+      // Reuse this tab when installing libraries.
+      window.name = "_tharunflow";
     </script>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->

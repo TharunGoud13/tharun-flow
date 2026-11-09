@@ -1,6 +1,4 @@
-import {
-  eyeIcon,
-} from "@excalidraw/excalidraw/components/icons";
+import { eyeIcon } from "@excalidraw/excalidraw/components/icons";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
@@ -32,19 +30,19 @@ export const AppMainMenu: React.FC<{
         shortcut="Cmd+S"
         onSelect={() => props.onSaveToFirebase?.()}
       >
-        Save to Firebase
+        Save diagram
       </MainMenu.Item>
       <MainMenu.Item
         icon={<PanelLeft size={18} />}
         onSelect={() => props.onOpenHistory?.()}
       >
-        Diagram History
+        History
       </MainMenu.Item>
       <MainMenu.Item
         icon={<Plus size={18} />}
         onSelect={() => props.onNewDiagram?.()}
       >
-        New Diagram
+        New diagram
       </MainMenu.Item>
       <MainMenu.Separator />
       <MainMenu.DefaultItems.LoadScene />

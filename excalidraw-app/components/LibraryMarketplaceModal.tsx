@@ -14,12 +14,15 @@ import {
   Database,
   ArrowRight,
 } from "lucide-react";
+
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
 import {
   CURATED_LIBRARIES,
-  CuratedLibraryDef,
   installLibrary,
 } from "../data/firebaseLibraryStorage";
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
+import type { CuratedLibraryDef } from "../data/firebaseLibraryStorage";
 
 interface Props {
   isOpen: boolean;
@@ -58,7 +61,9 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+      }
     };
     if (isOpen) {
       window.addEventListener("keydown", handleKeyDown);
@@ -77,14 +82,14 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
 
   const handleInstallOne = async (lib: CuratedLibraryDef) => {
     if (!excalidrawAPI) {
-      alert("Excalidraw is still initializing. Please try again in a moment.");
+      alert("The editor is still initializing. Please try again in a moment.");
       return;
     }
     setInstallingId(lib.id);
     try {
       const count = await installLibrary(lib, excalidrawAPI);
       setInstalledIds((prev) => new Set(prev).add(lib.id));
-      onSuccessToast(`Installed "${lib.name}" (${count} components) & synced to Firebase!`);
+      onSuccessToast(`“${lib.name}” installed · ${count} components`);
     } catch (err: any) {
       alert(`Failed to install library: ${err.message}`);
     } finally {
@@ -93,7 +98,9 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
   };
 
   const handleInstallAll = async () => {
-    if (!excalidrawAPI) return;
+    if (!excalidrawAPI) {
+      return;
+    }
     setIsInstallingAll(true);
     let totalInstalled = 0;
 
@@ -106,7 +113,7 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
         }
       }
       onSuccessToast(
-        `All ${CURATED_LIBRARIES.length} libraries (${totalInstalled} items) saved to Firebase!`,
+        `All ${CURATED_LIBRARIES.length} libraries installed · ${totalInstalled} components`,
       );
     } catch (err: any) {
       console.error(err);
@@ -115,7 +122,9 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div
@@ -139,7 +148,7 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
           maxWidth: "780px",
           maxHeight: "88vh",
           backgroundColor: "var(--island-bg-color, #ffffff)",
-          color: "var(--text-primary-color, #0f172a)",
+          color: "var(--text-primary-color, var(--color-on-surface))",
           borderRadius: "16px",
           boxShadow:
             "0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.08)",
@@ -166,8 +175,9 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                 width: "40px",
                 height: "40px",
                 borderRadius: "10px",
-                backgroundColor: "var(--color-primary-light, #fff0f2)",
-                color: "var(--color-primary, #eb0029)",
+                backgroundColor:
+                  "var(--color-primary-light, var(--color-primary-light))",
+                color: "var(--color-primary, var(--color-primary))",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -176,7 +186,9 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
               <Library size={22} strokeWidth={2.2} />
             </div>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
                 <h2
                   style={{
                     margin: 0,
@@ -185,7 +197,7 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                     letterSpacing: "-0.2px",
                   }}
                 >
-                  Excalidraw Libraries
+                  Libraries
                 </h2>
                 <span
                   style={{
@@ -193,22 +205,23 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                     fontWeight: 600,
                     padding: "2px 8px",
                     borderRadius: "12px",
-                    backgroundColor: "#ecfdf5",
-                    color: "#059669",
-                    border: "1px solid #a7f3d0",
+                    backgroundColor: "var(--color-success)",
+                    color: "var(--color-success-text)",
+                    border: "1px solid var(--color-success-darkest)",
                   }}
                 >
-                  Cross-Device Firebase
+                  Cross-Device Sync
                 </span>
               </div>
               <p
                 style={{
                   margin: "2px 0 0",
                   fontSize: "12.5px",
-                  color: "#64748b",
+                  color: "var(--text-secondary-color)",
                 }}
               >
-                Direct from libraries.excalidraw.com — saved to database across all devices
+                Curated for architecture, cloud and software teams — synced to
+                every device
               </p>
             </div>
           </div>
@@ -225,7 +238,7 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                 padding: "8px 14px",
                 borderRadius: "8px",
                 border: "none",
-                backgroundColor: "#eb0029",
+                backgroundColor: "var(--color-primary)",
                 color: "#ffffff",
                 fontSize: "12.5px",
                 fontWeight: 600,
@@ -233,15 +246,24 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                 transition: "all 0.15s ease",
                 boxShadow: "0 2px 6px rgba(235, 0, 41, 0.25)",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#d60024")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#eb0029")}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor =
+                  "var(--color-primary-hover)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "var(--color-primary)")
+              }
             >
               {isInstallingAll ? (
                 <Loader2 size={14} className="spin-animate" />
               ) : (
                 <Download size={14} strokeWidth={2.4} />
               )}
-              <span>{isInstallingAll ? "Installing..." : "Install All Top Libraries"}</span>
+              <span>
+                {isInstallingAll
+                  ? "Installing..."
+                  : "Install All Top Libraries"}
+              </span>
             </button>
 
             <button
@@ -254,7 +276,7 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                 borderRadius: "8px",
                 border: "none",
                 background: "transparent",
-                color: "#64748b",
+                color: "var(--text-secondary-color)",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -287,7 +309,7 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
               backgroundColor: "var(--input-bg-color, #f8fafc)",
             }}
           >
-            <Search size={16} color="#94a3b8" />
+            <Search size={16} color="var(--text-secondary-color)" />
             <input
               type="text"
               placeholder="Search architecture, AWS, Azure, GCP, databases, logos..."
@@ -310,7 +332,7 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                 style={{
                   border: "none",
                   background: "transparent",
-                  color: "#94a3b8",
+                  color: "var(--text-secondary-color)",
                   cursor: "pointer",
                   display: "flex",
                 }}
@@ -345,10 +367,14 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                     fontSize: "12.5px",
                     fontWeight: isActive ? 600 : 500,
                     border: isActive
-                      ? "1px solid #eb0029"
+                      ? "1px solid var(--color-primary)"
                       : "1px solid var(--default-border-color, #e2e8f0)",
-                    backgroundColor: isActive ? "#fff0f2" : "transparent",
-                    color: isActive ? "#eb0029" : "#475569",
+                    backgroundColor: isActive
+                      ? "var(--color-primary-light)"
+                      : "transparent",
+                    color: isActive
+                      ? "var(--color-primary)"
+                      : "var(--color-on-surface)",
                     cursor: "pointer",
                     whiteSpace: "nowrap",
                     transition: "all 0.15s ease",
@@ -383,10 +409,10 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                 key={lib.id}
                 style={{
                   border: isInstalled
-                    ? "1px solid #86efac"
+                    ? "1px solid var(--color-success-darkest)"
                     : "1px solid var(--default-border-color, #e2e8f0)",
                   backgroundColor: isInstalled
-                    ? "#f0fdf4"
+                    ? "var(--color-success)"
                     : "var(--island-bg-color, #ffffff)",
                   borderRadius: "12px",
                   padding: "16px",
@@ -412,7 +438,8 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                         margin: 0,
                         fontSize: "15px",
                         fontWeight: 700,
-                        color: "var(--text-primary-color, #0f172a)",
+                        color:
+                          "var(--text-primary-color, var(--color-on-surface))",
                       }}
                     >
                       {lib.name}
@@ -423,8 +450,8 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                         fontWeight: 600,
                         padding: "2px 7px",
                         borderRadius: "6px",
-                        backgroundColor: "#f1f5f9",
-                        color: "#475569",
+                        backgroundColor: "var(--color-surface-high)",
+                        color: "var(--color-on-surface)",
                       }}
                     >
                       ~{lib.itemCountEstimated} items
@@ -435,7 +462,7 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                     style={{
                       margin: "0 0 8px 0",
                       fontSize: "12.5px",
-                      color: "#475569",
+                      color: "var(--color-on-surface)",
                       lineHeight: "1.4",
                     }}
                   >
@@ -445,7 +472,7 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                   <div
                     style={{
                       fontSize: "11.5px",
-                      color: "#94a3b8",
+                      color: "var(--text-secondary-color)",
                       fontWeight: 500,
                     }}
                   >
@@ -471,11 +498,11 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                       alignItems: "center",
                       gap: "4px",
                       fontSize: "11.5px",
-                      color: "#64748b",
+                      color: "var(--text-secondary-color)",
                       textDecoration: "none",
                     }}
                   >
-                    <span>View online</span>
+                    <span>Preview library</span>
                     <ExternalLink size={11} />
                   </a>
 
@@ -489,31 +516,39 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
                       gap: "6px",
                       padding: "6px 12px",
                       borderRadius: "7px",
-                      border: isInstalled ? "1px solid #86efac" : "none",
+                      border: isInstalled
+                        ? "1px solid var(--color-success-darkest)"
+                        : "none",
                       backgroundColor: isInstalled
-                        ? "#dcfce7"
-                        : "#0f172a",
-                      color: isInstalled ? "#166534" : "#ffffff",
+                        ? "var(--color-success)"
+                        : "var(--text-primary-color)",
+                      color: isInstalled
+                        ? "var(--color-success-text)"
+                        : "var(--island-bg-color)",
                       fontSize: "12px",
                       fontWeight: 600,
-                      cursor: isInstalled ? "default" : isCurrentInstalling ? "wait" : "pointer",
+                      cursor: isInstalled
+                        ? "default"
+                        : isCurrentInstalling
+                        ? "wait"
+                        : "pointer",
                       transition: "all 0.15s ease",
                     }}
                   >
                     {isCurrentInstalling ? (
                       <>
                         <Loader2 size={13} className="spin-animate" />
-                        <span>Saving...</span>
+                        <span>Installing…</span>
                       </>
                     ) : isInstalled ? (
                       <>
                         <Check size={13} strokeWidth={2.5} />
-                        <span>In Database</span>
+                        <span>Installed</span>
                       </>
                     ) : (
                       <>
                         <Download size={13} strokeWidth={2.2} />
-                        <span>Install to DB</span>
+                        <span>Install</span>
                       </>
                     )}
                   </button>
@@ -533,14 +568,15 @@ export const LibraryMarketplaceModal: React.FC<Props> = ({
             alignItems: "center",
             justifyContent: "space-between",
             fontSize: "12px",
-            color: "#64748b",
+            color: "var(--text-secondary-color)",
           }}
         >
           <span>
-            {CURATED_LIBRARIES.length} top libraries curated from libraries.excalidraw.com
+            {CURATED_LIBRARIES.length} curated libraries for modern software
+            teams
           </span>
-          <span style={{ fontWeight: 600, color: "#eb0029" }}>
-            All installations persist to Firebase Firestore across devices
+          <span style={{ fontWeight: 600, color: "var(--color-primary)" }}>
+            Libraries stay in sync on every device
           </span>
         </div>
       </div>

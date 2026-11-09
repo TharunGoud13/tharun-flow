@@ -1,0 +1,47 @@
+.tf-welcome-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tf-welcome-brand__mark {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 113, 227, 0.18), 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.tf-welcome-brand__text {
+  font-family: var(--ui-font);
+  font-size: 31px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: var(--text-primary-color);
+}
+
+.tf-welcome-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.tf-welcome-heading__title {
+  font-family: var(--ui-font);
+  font-size: clamp(28px, 3.6vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: var(--text-primary-color);
+}
+
+.tf-welcome-heading__sub {
+  font-family: var(--ui-font);
+  font-size: clamp(14px, 1.6vw, 16px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+  color: var(--text-secondary-color);
+}

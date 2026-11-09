@@ -1,10 +1,8 @@
 import {
   Excalidraw,
-  LiveCollaborationTrigger,
   TTDDialogTrigger,
   CaptureUpdateAction,
   reconcileElements,
-  useEditorInterface,
   ExcalidrawAPIProvider,
   useExcalidrawAPI,
 } from "@excalidraw/excalidraw";
@@ -147,18 +145,25 @@ import "./index.scss";
 
 import { AppSidebar } from "./components/AppSidebar";
 import { DiagramHistorySidebar } from "./components/DiagramHistorySidebar";
-import { DiagramSwitcher, SaveStatus } from "./components/DiagramSwitcher";
-import { ToastNotification, ToastData } from "./components/ToastNotification";
+
+import { AppTopBar } from "./components/AppTopBar";
+
+import { ToastNotification } from "./components/ToastNotification";
 import { IconPickerModal } from "./components/IconPickerModal";
 import { LibraryMarketplaceModal } from "./components/LibraryMarketplaceModal";
-import type { IconDef } from "./components/iconData";
+
 import {
-  FirebaseDiagramRecord,
   initFirebaseDiagramStorage,
   saveDiagramToFirebase,
   createNewDiagramRecord,
   setActiveDiagramId,
 } from "./data/firebaseDiagramStorage";
+
+import type { FirebaseDiagramRecord } from "./data/firebaseDiagramStorage";
+
+import type { ToastData } from "./components/ToastNotification";
+import type { SaveStatus } from "./components/AppTopBar";
+import type { IconDef } from "./components/iconData";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -242,7 +247,9 @@ const initializeScene = async (opts: {
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
-  const activeDiagram = await initFirebaseDiagramStorage(localDataState?.elements);
+  const activeDiagram = await initFirebaseDiagramStorage(
+    localDataState?.elements,
+  );
 
   const initialElements =
     activeDiagram?.elements && activeDiagram.elements.length > 0
@@ -403,8 +410,6 @@ const ExcalidrawWrapper = () => {
 
   const [langCode, setLangCode] = useAppLangCode();
 
-  const editorInterface = useEditorInterface();
-
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -472,11 +477,13 @@ const ExcalidrawWrapper = () => {
 
   const [, forceRefresh] = useState(false);
 
-  const [activeDiagram, setActiveDiagram] = useState<FirebaseDiagramRecord | null>(null);
+  const [activeDiagram, setActiveDiagram] =
+    useState<FirebaseDiagramRecord | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
-  const [isLibraryMarketplaceOpen, setIsLibraryMarketplaceOpen] = useState(false);
+  const [isLibraryMarketplaceOpen, setIsLibraryMarketplaceOpen] =
+    useState(false);
   const [toast, setToast] = useState<ToastData | null>(null);
   const isLoadedRef = useRef(false);
   const lastSavedSceneVersionRef = useRef<number>(-1);
@@ -494,11 +501,15 @@ const ExcalidrawWrapper = () => {
 
   // Pre-seed initial architecture library if Firestore library is empty on first open
   useEffect(() => {
-    if (!excalidrawAPI) return;
+    if (!excalidrawAPI) {
+      return;
+    }
     LibraryFirebaseAdapter.load().then(async (data) => {
       if (!data || !data.libraryItems || data.libraryItems.length === 0) {
         try {
-          const res = await fetch("/libraries/software-architecture.excalidrawlib");
+          const res = await fetch(
+            "/libraries/software-architecture.excalidrawlib",
+          );
           if (res.ok) {
             const parsed = await res.json();
             const items = parsed.library || parsed.libraryItems || [];
@@ -545,11 +556,11 @@ const ExcalidrawWrapper = () => {
         setToast({
           id: Date.now(),
           type: "success",
-          message: "Saved to Firebase successfully!",
-          subMessage: `"${activeDiagram.name}" is persistent in Firestore.`,
+          message: "Diagram saved",
+          subMessage: `“${activeDiagram.name}” is up to date on every device.`,
         });
         excalidrawAPI.setToast({
-          message: `Saved "${activeDiagram.name}" to Firebase!`,
+          message: `Saved “${activeDiagram.name}”`,
           duration: 3000,
         });
       } else {
@@ -557,8 +568,8 @@ const ExcalidrawWrapper = () => {
         setToast({
           id: Date.now(),
           type: "error",
-          message: "Failed to save to Firebase",
-          subMessage: res.error || "Please check your network connection.",
+          message: "Couldn’t save diagram",
+          subMessage: "Check your connection and try again.",
         });
       }
     } catch (err: any) {
@@ -567,8 +578,8 @@ const ExcalidrawWrapper = () => {
       setToast({
         id: Date.now(),
         type: "error",
-        message: "Save error occurred",
-        subMessage: err?.message || "Unknown error",
+        message: "Couldn’t save diagram",
+        subMessage: "Check your connection and try again.",
       });
     }
   }, [excalidrawAPI, activeDiagram]);
@@ -590,7 +601,9 @@ const ExcalidrawWrapper = () => {
       isLoadedRef.current = false;
       setActiveDiagramId(diagram.id);
       setActiveDiagram(diagram);
-      lastSavedSceneVersionRef.current = getSceneVersion(diagram.elements || []);
+      lastSavedSceneVersionRef.current = getSceneVersion(
+        diagram.elements || [],
+      );
       setSaveStatus("saved");
       if (excalidrawAPI) {
         if (diagram.files && Object.keys(diagram.files).length > 0) {
@@ -621,7 +634,9 @@ const ExcalidrawWrapper = () => {
 
   const handleInsertIcon = useCallback(
     (icon: IconDef) => {
-      if (!excalidrawAPI) return;
+      if (!excalidrawAPI) {
+        return;
+      }
 
       const size = 64;
       const svg = icon.getSvg(size);
@@ -642,7 +657,9 @@ const ExcalidrawWrapper = () => {
       const centerX =
         -appState.scrollX + appState.width / 2 / appState.zoom.value - size / 2;
       const centerY =
-        -appState.scrollY + appState.height / 2 / appState.zoom.value - size / 2;
+        -appState.scrollY +
+        appState.height / 2 / appState.zoom.value -
+        size / 2;
 
       const newElement = newImageElement({
         type: "image",
@@ -666,8 +683,8 @@ const ExcalidrawWrapper = () => {
       setToast({
         id: Date.now(),
         type: "success",
-        message: `Added ${icon.title.split(" ")[0]} Icon`,
-        subMessage: `Positioned at center of canvas (${Math.round(centerX)}, ${Math.round(centerY)})`,
+        message: "Icon added",
+        subMessage: "Placed at the center of your canvas.",
       });
     },
     [excalidrawAPI],
@@ -1142,229 +1159,222 @@ const ExcalidrawWrapper = () => {
       style={{ height: "100%" }}
       className={clsx("excalidraw-app", {
         "is-collaborating": isCollaborating,
+        "theme--dark": editorTheme === "dark",
       })}
     >
-      <Excalidraw
-        viewportStatusFrame={viewportStatusFrame}
-        userToFollow={userToFollow}
-        onChange={onChange}
-        onExport={onExport}
-        initialData={initialStatePromiseRef.current.promise}
-        isCollaborating={isCollaborating}
-        onPointerUpdate={collabAPI?.onPointerUpdate}
-        UIOptions={{
-          canvasActions: {
-            toggleTheme: true,
-            export: {
-              onExportToBackend,
-            },
-          },
-        }}
-        langCode={langCode}
-        renderCustomStats={renderCustomStats}
-        detectScroll={false}
-        handleKeyboardGlobally={true}
-        autoFocus={true}
-        theme={editorTheme}
-        onThemeChange={setAppTheme}
-        renderTopLeftUI={() => (
-          <DiagramSwitcher
-            activeDiagramName={activeDiagram?.name || "Diagram"}
-            saveStatus={saveStatus}
-            onSave={handleSaveToFirebase}
-            onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-            onQuickNew={handleQuickNew}
-            onOpenIcons={() => setIsIconPickerOpen(true)}
-            onOpenLibraries={() => setIsLibraryMarketplaceOpen(true)}
-            isSidebarOpen={isSidebarOpen}
-          />
-        )}
-        renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || !isCollabAvailable) {
-            return null;
-          }
-
-          return (
-            <div className="excalidraw-ui-top-right">
-              {collabError.message && <CollabError collabError={collabError} />}
-              <LiveCollaborationTrigger
-                isCollaborating={isCollaborating}
-                onSelect={() =>
-                  setShareDialogState({ isOpen: true, type: "share" })
-                }
-                editorInterface={editorInterface}
-              />
-            </div>
-          );
-        }}
-        onLinkOpen={(element, event) => {
-          if (element.link && isElementLink(element.link)) {
-            event.preventDefault();
-            excalidrawAPI?.setViewport({
-              target: element.link,
-              fit: "scale-down",
-              animation: true,
-            });
-          }
-        }}
-      >
-        <AppMainMenu
-          onCollabDialogOpen={onCollabDialogOpen}
+      <AppTopBar
+        activeDiagramName={activeDiagram?.name || "Untitled diagram"}
+        saveStatus={saveStatus}
+        isSidebarOpen={isSidebarOpen}
+        canShare={isCollabAvailable}
+        onSave={handleSaveToFirebase}
+        onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+        onOpenIcons={() => setIsIconPickerOpen(true)}
+        onOpenLibraries={() => setIsLibraryMarketplaceOpen(true)}
+        onShare={() => setShareDialogState({ isOpen: true, type: "share" })}
+      />
+      <div className="excalidraw-app__canvas">
+        <Excalidraw
+          viewportStatusFrame={viewportStatusFrame}
+          userToFollow={userToFollow}
+          onChange={onChange}
+          onExport={onExport}
+          initialData={initialStatePromiseRef.current.promise}
           isCollaborating={isCollaborating}
-          isCollabEnabled={isCollabAvailable}
-          theme={appTheme}
-          refresh={() => forceRefresh((prev) => !prev)}
-          onOpenHistory={() => setIsSidebarOpen(true)}
-          onNewDiagram={handleQuickNew}
-          onSaveToFirebase={handleSaveToFirebase}
-        />
-        <AppWelcomeScreen
-          onCollabDialogOpen={onCollabDialogOpen}
-          isCollabEnabled={isCollabAvailable}
-        />
-        <OverwriteConfirmDialog>
-          <OverwriteConfirmDialog.Actions.ExportToImage />
-          <OverwriteConfirmDialog.Actions.SaveToDisk />
-        </OverwriteConfirmDialog>
-        <AppFooter onChange={() => excalidrawAPI?.refresh()} />
-        {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
-
-        <TTDDialogTrigger />
-        {isCollaborating && isOffline && (
-          <div className="alertalert--warning">
-            {t("alerts.collabOfflineWarning")}
-          </div>
-        )}
-        {localStorageQuotaExceeded && (
-          <div className="alert alert--danger">
-            {t("alerts.localStorageQuotaExceeded")}
-          </div>
-        )}
-        {latestShareableLink && (
-          <ShareableLinkDialog
-            link={latestShareableLink}
-            onCloseRequest={() => setLatestShareableLink(null)}
-            setErrorMessage={setErrorMessage}
-          />
-        )}
-        {excalidrawAPI && !isCollabDisabled && (
-          <Collab excalidrawAPI={excalidrawAPI} />
-        )}
-
-        <ShareDialog
-          collabAPI={collabAPI}
-          onExportToBackend={async () => {
-            if (excalidrawAPI) {
-              try {
-                await onExportToBackend(
-                  excalidrawAPI.getSceneElements(),
-                  excalidrawAPI.getAppState(),
-                  excalidrawAPI.getFiles(),
-                );
-              } catch (error: any) {
-                setErrorMessage(error.message);
-              }
+          onPointerUpdate={collabAPI?.onPointerUpdate}
+          UIOptions={{
+            canvasActions: {
+              toggleTheme: true,
+              export: {
+                onExportToBackend,
+              },
+            },
+          }}
+          langCode={langCode}
+          renderCustomStats={renderCustomStats}
+          detectScroll={false}
+          handleKeyboardGlobally={true}
+          autoFocus={true}
+          theme={editorTheme}
+          onThemeChange={setAppTheme}
+          renderTopRightUI={() =>
+            collabError.message ? (
+              <CollabError collabError={collabError} />
+            ) : null
+          }
+          onLinkOpen={(element, event) => {
+            if (element.link && isElementLink(element.link)) {
+              event.preventDefault();
+              excalidrawAPI?.setViewport({
+                target: element.link,
+                fit: "scale-down",
+                animation: true,
+              });
             }
           }}
-        />
-
-        <AppSidebar />
-
-        {errorMessage && (
-          <ErrorDialog onClose={() => setErrorMessage("")}>
-            {errorMessage}
-          </ErrorDialog>
-        )}
-
-        <CommandPalette
-          customCommandPaletteItems={[
-            {
-              label: t("labels.liveCollaboration"),
-              category: DEFAULT_CATEGORIES.app,
-              predicate: isCollabAvailable,
-              keywords: [
-                "team",
-                "multiplayer",
-                "share",
-                "public",
-                "session",
-                "invite",
-              ],
-              icon: usersIcon,
-              perform: () => {
-                setShareDialogState({
-                  isOpen: true,
-                  type: "collaborationOnly",
-                });
-              },
-            },
-            {
-              label: t("roomDialog.button_stopSession"),
-              category: DEFAULT_CATEGORIES.app,
-              predicate: () => !!collabAPI?.isCollaborating(),
-              keywords: [
-                "stop",
-                "session",
-                "end",
-                "leave",
-                "close",
-                "exit",
-                "collaboration",
-              ],
-              perform: () => {
-                if (collabAPI) {
-                  collabAPI.stopCollaboration();
-                  if (!collabAPI.isCollaborating()) {
-                    setShareDialogState({ isOpen: false });
-                  }
-                }
-              },
-            },
-            {
-              label: t("labels.share"),
-              category: DEFAULT_CATEGORIES.app,
-              predicate: isCollabAvailable,
-              icon: share,
-              keywords: [
-                "link",
-                "shareable",
-                "readonly",
-                "export",
-                "publish",
-                "snapshot",
-                "url",
-                "collaborate",
-                "invite",
-              ],
-              perform: async () => {
-                setShareDialogState({ isOpen: true, type: "share" });
-              },
-            },
-            {
-              label: t("labels.installPWA"),
-              category: DEFAULT_CATEGORIES.app,
-              predicate: () => !!pwaEvent,
-              perform: () => {
-                if (pwaEvent) {
-                  pwaEvent.prompt();
-                  pwaEvent.userChoice.then(() => {
-                    // event cannot be reused, but we'll hopefully
-                    // grab new one as the event should be fired again
-                    pwaEvent = null;
-                  });
-                }
-              },
-            },
-          ]}
-        />
-        {isVisualDebuggerEnabled() && excalidrawAPI && (
-          <DebugCanvas
-            appState={excalidrawAPI.getAppState()}
-            scale={window.devicePixelRatio}
-            ref={debugCanvasRef}
+        >
+          <AppMainMenu
+            onCollabDialogOpen={onCollabDialogOpen}
+            isCollaborating={isCollaborating}
+            isCollabEnabled={isCollabAvailable}
+            theme={appTheme}
+            refresh={() => forceRefresh((prev) => !prev)}
+            onOpenHistory={() => setIsSidebarOpen(true)}
+            onNewDiagram={handleQuickNew}
+            onSaveToFirebase={handleSaveToFirebase}
           />
-        )}
-      </Excalidraw>
+          <AppWelcomeScreen
+            onCollabDialogOpen={onCollabDialogOpen}
+            isCollabEnabled={isCollabAvailable}
+            onNewDiagram={handleQuickNew}
+            onOpenHistory={() => setIsSidebarOpen(true)}
+            onOpenIcons={() => setIsIconPickerOpen(true)}
+            onOpenLibraries={() => setIsLibraryMarketplaceOpen(true)}
+          />
+          <OverwriteConfirmDialog>
+            <OverwriteConfirmDialog.Actions.ExportToImage />
+            <OverwriteConfirmDialog.Actions.SaveToDisk />
+          </OverwriteConfirmDialog>
+          <AppFooter onChange={() => excalidrawAPI?.refresh()} />
+          {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
+
+          <TTDDialogTrigger />
+          {isCollaborating && isOffline && (
+            <div className="alertalert--warning">
+              {t("alerts.collabOfflineWarning")}
+            </div>
+          )}
+          {localStorageQuotaExceeded && (
+            <div className="alert alert--danger">
+              {t("alerts.localStorageQuotaExceeded")}
+            </div>
+          )}
+          {latestShareableLink && (
+            <ShareableLinkDialog
+              link={latestShareableLink}
+              onCloseRequest={() => setLatestShareableLink(null)}
+              setErrorMessage={setErrorMessage}
+            />
+          )}
+          {excalidrawAPI && !isCollabDisabled && (
+            <Collab excalidrawAPI={excalidrawAPI} />
+          )}
+
+          <ShareDialog
+            collabAPI={collabAPI}
+            onExportToBackend={async () => {
+              if (excalidrawAPI) {
+                try {
+                  await onExportToBackend(
+                    excalidrawAPI.getSceneElements(),
+                    excalidrawAPI.getAppState(),
+                    excalidrawAPI.getFiles(),
+                  );
+                } catch (error: any) {
+                  setErrorMessage(error.message);
+                }
+              }
+            }}
+          />
+
+          <AppSidebar />
+
+          {errorMessage && (
+            <ErrorDialog onClose={() => setErrorMessage("")}>
+              {errorMessage}
+            </ErrorDialog>
+          )}
+
+          <CommandPalette
+            customCommandPaletteItems={[
+              {
+                label: t("labels.liveCollaboration"),
+                category: DEFAULT_CATEGORIES.app,
+                predicate: isCollabAvailable,
+                keywords: [
+                  "team",
+                  "multiplayer",
+                  "share",
+                  "public",
+                  "session",
+                  "invite",
+                ],
+                icon: usersIcon,
+                perform: () => {
+                  setShareDialogState({
+                    isOpen: true,
+                    type: "collaborationOnly",
+                  });
+                },
+              },
+              {
+                label: t("roomDialog.button_stopSession"),
+                category: DEFAULT_CATEGORIES.app,
+                predicate: () => !!collabAPI?.isCollaborating(),
+                keywords: [
+                  "stop",
+                  "session",
+                  "end",
+                  "leave",
+                  "close",
+                  "exit",
+                  "collaboration",
+                ],
+                perform: () => {
+                  if (collabAPI) {
+                    collabAPI.stopCollaboration();
+                    if (!collabAPI.isCollaborating()) {
+                      setShareDialogState({ isOpen: false });
+                    }
+                  }
+                },
+              },
+              {
+                label: t("labels.share"),
+                category: DEFAULT_CATEGORIES.app,
+                predicate: isCollabAvailable,
+                icon: share,
+                keywords: [
+                  "link",
+                  "shareable",
+                  "readonly",
+                  "export",
+                  "publish",
+                  "snapshot",
+                  "url",
+                  "collaborate",
+                  "invite",
+                ],
+                perform: async () => {
+                  setShareDialogState({ isOpen: true, type: "share" });
+                },
+              },
+              {
+                label: t("labels.installPWA"),
+                category: DEFAULT_CATEGORIES.app,
+                predicate: () => !!pwaEvent,
+                perform: () => {
+                  if (pwaEvent) {
+                    pwaEvent.prompt();
+                    pwaEvent.userChoice.then(() => {
+                      // event cannot be reused, but we'll hopefully
+                      // grab new one as the event should be fired again
+                      pwaEvent = null;
+                    });
+                  }
+                },
+              },
+            ]}
+          />
+          {isVisualDebuggerEnabled() && excalidrawAPI && (
+            <DebugCanvas
+              appState={excalidrawAPI.getAppState()}
+              scale={window.devicePixelRatio}
+              ref={debugCanvasRef}
+            />
+          )}
+        </Excalidraw>
+      </div>
       <DiagramHistorySidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
@@ -1386,7 +1396,7 @@ const ExcalidrawWrapper = () => {
           setToast({
             id: Date.now(),
             type: "success",
-            message: "Library Saved to Firebase",
+            message: "Library saved",
             subMessage: msg,
           })
         }
