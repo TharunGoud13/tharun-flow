@@ -406,6 +406,8 @@ export const IconPickerModal: React.FC<Props> = ({
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
+                          backgroundColor: "var(--color-surface-low, #e9ecef)",
+                          borderRadius: "6px",
                         }}
                       />
                     )}
